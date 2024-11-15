@@ -1,0 +1,85 @@
+body{
+    background-color: bisque;
+}
+
+h1{
+    text-align: center;
+    color:darkblue;;
+    font-size: 3em;
+    margin-bottom: 10px;
+    font-family: cursive;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    background-color: rgb(231, 197, 153);
+    transition: background-color 1s;
+    cursor: pointer;
+}
+
+h1:hover{
+    background-color: rgb(255, 255, 255);
+}
+
+label{
+    font-size: 1.0em;
+    margin-bottom: 5px;
+    font-family: cursive;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    background-color: rgb(255, 232, 203);
+    transition: background-color 0.5s;
+    cursor: pointer;
+    color: darkblue;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.5s;
+    background-color: rgb(255, 228, 161);
+}
+
+label:hover{
+    animation: 0.5px;
+    background-color: rgb(255, 228, 161);
+    color: darkblue;
+    cursor: pointer;
+    animation-name: colorchange;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-fill-mode: forwards;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.5s;
+    background-color: rgb(255, 228, 161);
+    cursor: pointer;
+    color: darkblue;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes colorchange {
+    0%   {color: darkblue;}
+    50%  {color: rgb(18, 254, 140);}
+    100% {color: darkblue}
+}
+
+button{
+    animation: 0.5px;
+    background-color: rgb(255, 228, 161);
+    color: darkblue;
+    cursor: pointer;
+    animation-name: colorchange;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-fill-mode: forwards;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.5s;
+    background-color: rgb(255, 228, 161);
+    cursor: pointer;
+    color: darkblue;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+}
+
+button:hover{
+    background-color: rgb(255, 247, 223);
+    animation: 2s;
+    color: aquamarine;
+    background-color: rgb(231, 197, 153);
+    font-family: cursive;
+}

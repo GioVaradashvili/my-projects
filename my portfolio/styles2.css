@@ -1,0 +1,109 @@
+body{
+    background-color: blanchedalmond;
+}
+
+h1{
+        text-align: center;
+        color:darkblue;;
+        font-size: 3em;
+        margin-bottom: 20px;
+        font-family: cursive;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+        background-color: rgb(231, 197, 153);
+        transition: background-color 0.5s;
+        cursor: pointer;
+}
+    
+    h1:hover{
+        background-color: rgb(255, 255, 255);
+}
+
+p{
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 50px;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    background-color: rgb(231, 197, 153);
+    transition: background-color 0.5s;
+    cursor: pointer;
+    font-family: cursive;
+}
+
+
+p:hover{
+        background-color: rgb(255, 255, 255);
+}
+
+img{
+    width:700px;
+    border-radius: 40%;
+    box-shadow: 0px 0px 10px 5px rgba(255, 196, 0, 0.782);
+    background-color: rgb(231, 197, 153);
+    transition: background-color 0.5s;
+    cursor: pointer;
+}
+
+img:hover{
+        background-color: rgb(0, 0, 0);
+}
+
+button{
+    margin-top: 20px;
+    font-size: 1.2em;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+    background-color: rgb(231, 197, 153);
+    transition: background-color 0.5s;
+    cursor: pointer;
+    font-family: cursive;
+    border: none;
+    outline: none;
+    color: rgb(35, 35, 255);
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+button:hover{
+        background-color: darkblue;
+        transition: background-color 4s;
+        color: rgb(255, 255, 255);
+        text-decoration: underline;
+}
+
+b{
+    color: rgb(0, 109, 211);
+}
+
+h2{
+    color: darkblue;
+    font-family: cursive;  
+}
+
+img{
+    max-width: 100%;
+    height: auto;
+    margin: 10px;
+    transition: transform 0.5s;
+    cursor: pointer;
+    box-shadow: 0px 0px 10px 5px rgb(154, 134, 3);
+    border-radius: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+    position: relative;
+    border-color:darkblue transparent;
+}
+
+img:hover{
+    transform: scale(1.1);
+    border-color: darkblue rgb(160, 0, 0);
+}
+
