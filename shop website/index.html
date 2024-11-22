@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>მაიკების ონლაინ მაღაზია</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>მაიკების ონლაინ მაღაზია</h1>
+    </header>
+
+    <div class="container">
+        <h2>აირჩიეთ გუნდი</h2>
+        <div class="teams">
+            <div class="team" id="barcelona">
+                <h3>ბარსელონა</h3>
+                <img src="barca.png" alt="ბარსელონას მაისური">
+                <button class="buy-button" onclick="addToCart('50 ლარი ბარსელონას მაისური')">-30% <br>ყიდვა</button>
+            </div>
+            <div class="team" id="real-madrid">
+                <h3>რეალ მადრიდი</h3>
+                <img src="real.png" alt="რეალის მაისური">
+                <button class="buy-button" onclick="addToCart('50 ლარი რეალის მაისური')"> -30% <br>ყიდვა</button>
+            </div>
+        </div>
+
+        <div class="cart">
+            <h3>შეკვეთის შინაარსი</h3>
+            <ul id="cart-items"></ul>
+            <button id="checkout-button" onclick="checkout()">გადახდა</button>
+            <label>
+                <br>
+                <label for="free-shipping">აქ ჩაწერეთ თქვენი საბანკო კარტის მონაცემი:</label>
+                <input type="text" id="coupon-code" placeholder="enter your card data:">
+                <p id="coupon-error"></p>
+            </label>
+        </div>
+    </div>
+    </label>
+    <footer>
+        <p> მაიკების ონლაინ მაღაზია</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
