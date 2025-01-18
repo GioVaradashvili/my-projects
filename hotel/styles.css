@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgb(91, 169, 230);
+    margin: 0;
+    padding: 0;
+    background-color: rgb(128, 200, 247);
+}
+
+.container {
+    width: 300px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #058397;
+    border-radius: 44px;
+    box-shadow: 0 0 10px rgb(0, 192, 96);
+    color: #000000;
+    font-family: cursive;
+}
+
+h2 {
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.error {
+    color: red;
+    margin-top: 5px;
+}
+
+.success {
+    color: rgb(0, 207, 0);
+    margin-top: 5px;
+}
+
+@media only screen and (max-width: 600px) {
+    .container {
+        width: 100%;
+    }
+}
+
+.error, .success {
+    text-align: center;
+}
+
+a{
+    color: #850000;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.5s;
+    cursor: pointer;
+    font-family: cursive;
+    margin-top: 20px;
+    text-align: center;
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #004c5d4d;
+    border-radius: 500px;
+    box-shadow: 0 0 10px rgb(0, 192, 96);
+    border: none;
+    box-sizing:content-box;
+    font-size: 1.2em;
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+a:hover{
+    color: #00936c;
+}
+
+h1{
+    text-align: center;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #00383e91;
+    margin-top: 20px;
+    font-size: 2.5em;
+    padding: 10px;
+}
+
+@media only screen and (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+    }
+}
+
+button {
+    padding: 8px 20px;
+    background-color: #0084a14d;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 1em;
+    margin-top: 10px;
+    transition: background-color 0.5s;
+}

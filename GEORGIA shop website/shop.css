@@ -1,0 +1,61 @@
+body{
+    background-color: rgb(231, 226, 230);
+}
+
+h1{
+    text-align: left;
+    color: rgb(0, 0, 0);
+    font-size: 30px;
+    margin-bottom: 20px;
+    font-family: cursive;
+    text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.5);  
+}
+
+h1:hover{
+    color: rgb(255, 0, 0);
+    text-shadow: 4px 4px 8px rgba(255, 0, 0, 0.5);
+    transition: color 0.3s, text-shadow 0.5s;
+    cursor: pointer;
+}
+
+h2{
+    text-align: left;
+    color: rgb(198, 0, 0);
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    text-shadow: 2px 2px 4px rgb(0, 0, 0);
+}
+
+h2:hover{
+    color: rgb(255, 0, 0);
+    text-shadow: 4px 4px 8px rgb(0, 0, 0);
+    transition: color 0.3s, text-shadow 0.5s;
+    cursor: pointer;
+}
+
+p{
+    text-align: left;
+    color: rgb(40, 173, 0);
+    font-size: 25px;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    text-shadow: 2px 2px 4px rgb(255, 0, 0);
+}
+
+button{
+    background-color: rgb(0, 128, 0);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover{
+    background-color: rgb(0, 153, 0);
+    color: white;
+    transition: background-color 0.3s, color 0.3s;
+}

@@ -1,0 +1,126 @@
+body{
+    background-color: #a0aecd ;
+}
+
+
+
+li{
+    position: relative;
+    list-style: none;
+    width: 200px;
+    padding: 15px;
+    background-color: rgb(121, 121, 255);
+    z-index: calc(1* var(--i));
+    transition: 0.5s;
+}
+
+li:hover{
+    background-color: rgb(34, 34, 117);
+    transform: translateX(-50px);
+}
+
+li:before{
+    font-family: 'FontAwesome';
+    color: #d6d6d6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    content: attr(data-icon);
+    position: absolute;
+    top: 0;
+    left: -40px;
+    width: 40px;
+    height: 100%;
+    background: #004c7e;
+    transform-origin: right;
+    transform: skewY(45deg);
+    transform: 0.5s;
+}
+
+li:hover::before{
+    background: 7b5190;
+}
+
+li::after{
+    content: "";
+    position: absolute;
+    top: -40;
+    left: 0px;
+    height: 40px;
+    background: #00406b;
+    transform-origin: button;
+    transform: skewY(45deg);
+    transform: 0.5s;
+}
+
+li:hover::after{
+    background: #3d3e8b;
+}
+
+li a{
+    text-decoration: none;
+    color: #004cff;
+    display: block;
+    text-decoration: uppercase;
+    letter-spacing: 0.05em;
+    transition: 0.5s;
+}
+
+li:hover a {
+    color: #fff;
+}
+
+li:last-child::after{
+    box-shadow: -120px 120px 20px rgba(0,0,0,0.25);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'inter', sans-serif;
+    color: rgb(0, 88, 164);
+}
+
+label{
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #004c7e;
+    letter-spacing: 0.05em;
+}
+
+input{
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    transition: 0.5s;
+    color: #004c7e;
+    border: 30px;
+    border-color: #004c7e transparent;
+}
+
+input:focus{
+    border-color: #7b5190 transparent;
+}
+
+button{
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #004c7e;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+button:hover{
+    background-color: #3d3e8b;
+}
+
+img{
+    border: 60px;
+    border-radius: 20%;
+}
