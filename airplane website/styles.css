@@ -1,0 +1,35 @@
+body{
+    background-color: #757575;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+}
+
+img{
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 40px;
+    border-style: solid;
+    border-color: #757575;
+    border-radius: 60px;
+}
+
+h1{
+    text-align: center;
+    font-size: 2em;
+    color: #b00000;
+}
+
+h2{
+    text-align: center;
+    font-size: 1.5em;
+    color: #b00000;
+}
