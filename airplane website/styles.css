@@ -33,3 +33,18 @@ h2{
     font-size: 1.5em;
     color: #b00000;
 }
+
+
+button{
+    background-color: #b00000;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+button:hover{
+    background-color: #ff0000;
+}
