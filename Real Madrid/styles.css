@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+}
+
+header {
+    background: #0033cc;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.hero {
+    background: url('football-hero.jpg') no-repeat center center/cover;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+.team-members {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.member {
+    text-align: center;
+}
+
+footer {
+    background: #0033cc;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+img{
+    border-radius: 20%;
+}
+
+img:hover{
+    transform: scale(1.1);
+    transition: transform 0.5s;
+    background-color: #700000;
+    border-radius: 20%;
+    color: white;
+}
+
+h1{
+    color: #0033cc;;
+}
+
+h1:hover{
+    color: #00a2ff;;
+}
+
+h2:hover{
+    color: #0033cc;;
+}
+
+h2{
+    color: #00a2ff;;
+}
+
+h3{
+    color: #ffffff;;
+}
+
+h3:hover{
+    color: #00a2ff;;
+}
+
+ul{
+    color: #0033cc;;
+}
