@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 იანვარი - ჩვენი ისტორია</title>
+    <section class="love-letter">
+    <div class="letter-paper">
+        <p>ერთი წლის წინ, როცა გაგიცანი და დიალოგში შემოხვედი ერთერთი საუკეთესო დღე იყო ჩემს ცხოვრებაში მიხარია რომ ამდენი ხანი გავიდა და ისევ ერთად ვართ</p>
+        <p>მადლობა, რომ ამ ერთ წელში ამდენი ბედნიერი წამი მაჩუქე.</p>
+        <p style="text-align: right; margin-top: 30px;">— გიორგი ვარადაშვილი</p>
+    </div>
+</section>
+
+<style>
+    .love-letter {
+        padding: 60px 20px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    .letter-paper {
+        background: #fff;
+        padding: 40px;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border-left: 5px solid var(--primary-color);
+        line-height: 1.8;
+        font-family: 'Georgia', serif; /* უფრო "საწერი" სტილი */
+        color: #555;
+    }
+</style>
+    <style>
+        :root {
+            --primary-color: #d88fa2;
+            --text-color: #4a4a4a;
+            --bg-gradient: linear-gradient(-45deg, #fff5f6, #f9e4e7, #fcf0f2, #ffffff);
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- გაბზარული ეკრანის ეფექტი --- */
+        #crack-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            cursor: pointer;
+            background-image: url('https://www.transparentpng.com/download/broken-glass/broken-glass-transparent-background-9.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        #crack-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .click-hint {
+            color: #555;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+
+        /* --- Header --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            animation: fadeInOut 4s infinite ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        /* --- First Message Section --- */
+        .first-moment {
+            max-width: 800px;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .screenshot-container {
+            display: inline-block;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            margin: 40px 0;
+        }
+
+        .screenshot-container img {
+            max-width: 100%;
+            width: 320px;
+            height: auto;
+            display: block;
+            border-radius: 5px;
+        }
+
+        /* --- Timer Section --- */
+        .timer-section {
+            padding: 60px 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .timer {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 20px;
+            min-width: 85px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            font-weight: 200;
+        }
+
+        /* --- Gallery Section --- */
+        .gallery-section {
+            padding: 80px 20px;
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .photo-item {
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s ease-out;
+        }
+
+        .photo-item.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* --- Floating Hearts --- */
+        .heart {
+            position: fixed;
+            bottom: -50px;
+            color: var(--primary-color);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 10;
+            animation: flyUp linear infinite;
+        }
+
+        @keyframes flyUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.4; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        footer {
+            padding: 100px 20px;
+            font-style: italic;
+            font-weight: 300;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="crack-overlay" onclick="repairScreen()">
+        <div class="click-hint">შეეხე ეკრანის შესაკეთებლად...</div>
+    </div>
+
+    <header>
+        <h1>7 იანვარი</h1>
+        <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 4px;">დღე, როცა სამყარო შეიცვალა</p>
+    </header>
+
+    <section class="first-moment">
+        <h2 style="font-weight: 300;">ყველაფერი ამ კითხვით დაიწყო...</h2>
+        <div class="screenshot-container">
+            <img src="image.png" alt="პირველი დიალოგი">
+        </div>
+        <p style="color: #999; font-size: 0.9rem; letter-spacing: 1px;">2024 • 20:23</p>
+    </section>
+
+    <div class="timer-section">
+        <h3 style="font-weight: 300; margin-bottom: 35px;">ჩვენი ერთად ყოფნის დრო:</h3>
+        <div class="timer">
+            <div class="time-box"><span id="days">0</span>დღე</div>
+            <div class="time-box"><span id="hours">0</span>სთ</div>
+            <div class="time-box"><span id="minutes">0</span>წთ</div>
+            <div class="time-box"><span id="seconds">0</span>წმ</div>
+        </div>
+    </div>
+
+    <section class="gallery-section">
+        <h2 style="font-weight: 300;">მოგონებები</h2>
+        <div class="gallery-grid">
+            <div class="photo-item">
+                <img src="image copy 3.png" alt="ფოტო 1">
+            </div>
+            <div class="photo-item">
+                <img src="image copy 2.png" alt="ფოტო 2">
+            </div>
+            <div class="photo-item">
+                <img src="image copy.png" alt="ფოტო 3">
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>"მადლობა, რომ ჩემს ცხოვრებაში გამოჩნდი."</p>
+    </footer>
+
+    <script>
+        // 1. ეკრანის "შეკეთების" ფუნქცია
+        function repairScreen() {
+            const overlay = document.getElementById('crack-overlay');
+            overlay.classList.add('hidden');
+        }
+
+        // 2. მრიცხველი (ზუსტი თარიღით)
+        const startDate = new Date("January 7, 2024 20:23:00").getTime();
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = now - startDate;
+            document.getElementById("days").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("minutes").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("seconds").innerText = Math.floor((diff % (1000 * 60)) / 1000);
+        }
+        setInterval(updateTimer, 1000);
+
+        // 3. გალერეის ანიმაცია ჩამოწევისას
+        const observerOptions = { threshold: 0.15 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('appear');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.photo-item').forEach(photo => {
+            observer.observe(photo);
+        });
+
+        // 4. უსასრულო გულების წვიმა
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = "❤";
+            heart.classList.add('heart');
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = Math.random() * 15 + 12 + "px";
+            heart.style.animationDuration = Math.random() * 3 + 5 + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 7000);
+        }
+        setInterval(createHeart, 450);
+    </script>
+</body>
+</html>
