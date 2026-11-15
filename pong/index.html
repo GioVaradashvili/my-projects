@@ -2,1510 +2,1054 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Città dell’amore | Sun, Moon & Stars</title>
-    <link rel="icon" href="/images/Logo.png" type="images/icon type"> 
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- Three.js for 3D Celestial Graphics -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D YELLOW RED CREATED BY VARADA</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-main: #f8f9fd;
-            --bg-card: #ffffff;
-            --text-primary: #111111;
-            --text-muted: #707072;
-            --gold-accent: #d4af37;
-            --gold-deep: #aa8c2c;
-            --border-line: #e5e5e5;
-            --panel-shadow: rgba(0, 0, 0, 0.05);
-            --nike-easing: cubic-bezier(0.16, 1, 0.3, 1);
-            --transition-speed: 0.5s;
-        }
-
-        [data-theme="dark"] {
-            --bg-main: #0b0b0e;
-            --bg-card: #141418;
-            --text-primary: #ffffff;
-            --text-muted: #9e9e9e;
-            --border-line: #2d2d30;
-            --panel-shadow: rgba(0, 0, 0, 0.6);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            font-family: 'Poppins', sans-serif;
-            transition: background-color var(--transition-speed) var(--nike-easing), color var(--transition-speed) var(--nike-easing);
-            overflow-x: hidden;
-        }
-
-        /* --- 10-SECOND CINEMATIC LOADING SCREEN --- */
-        #loader-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+            background-color: #0d0905;
+            color: #ffffff;
+            font-family: 'Noto Sans Georgian', sans-serif;
+            overflow: hidden;
             width: 100vw;
             height: 100vh;
-            background: #050508;
-            z-index: 9999;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), visibility 1s;
         }
 
-        #loader-canvas-container {
-            width: 280px;
-            height: 280px;
+        #game-wrapper {
             position: relative;
-        }
-
-        .loader-brand {
-            font-family: 'Cinzel', serif;
-            color: #d4af37;
-            font-size: 1.5rem;
-            letter-spacing: 4px;
-            margin-top: 25px;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .loader-progress-bar-wrap {
-            width: 220px;
-            height: 3px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-
-        .loader-progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #d4af37, #ffd700);
-            transition: width 0.1s linear;
-        }
-
-        .loader-percentage {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 10px;
-            letter-spacing: 2px;
-        }
-
-        /* --- NAVIGATION --- */
-        .luxury-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 5%;
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border-line);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: background-color var(--transition-speed) var(--nike-easing);
-        }
-
-        .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--text-primary);
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 35px;
-        }
-
-        .menu-link {
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 0.95rem;
-            padding: 8px 0;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .menu-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--gold-accent);
-            transition: width 0.3s var(--nike-easing);
-        }
-
-        .menu-link:hover::after,
-        .menu-link.active::after {
             width: 100%;
-        }
-
-        .nav-utilities {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .nav-btn-primary {
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            border: 1px solid var(--text-primary);
-            padding: 10px 24px;
-            font-weight: 600;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s var(--nike-easing);
-        }
-
-        .nav-btn-primary:hover {
-            background-color: var(--gold-accent);
-            border-color: var(--gold-accent);
-            color: white;
-        }
-
-        .nav-btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border-line);
-            color: var(--text-primary);
-            padding: 10px 20px;
-            font-weight: 500;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s var(--nike-easing);
-        }
-
-        .nav-btn-secondary:hover {
-            background-color: var(--bg-main);
-        }
-
-        /* --- HERO SECTION WITH 3D CANVAS --- */
-        .nike-style-hero {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: calc(90vh - 75px);
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border-line);
-        }
-
-        .hero-text-side {
+            height: 100%;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
-            padding: 60px 10%;
         }
 
-        .hero-series-tag {
-            color: var(--gold-accent);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            touch-action: none;
         }
 
-        .hero-display-title {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            line-height: 1.05;
-            font-weight: 800;
-            margin-bottom: 25px;
-            letter-spacing: -1px;
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
 
-        .hero-lead-text {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.6;
-            margin-bottom: 35px;
+        #hud-top {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: rgba(30, 20, 10, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            padding: 10px 28px;
+            border-radius: 50px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.2), inset 0 0 12px rgba(255, 255, 255, 0.05);
+            pointer-events: none;
         }
 
-        .hero-action-cta {
-            display: inline-block;
-            align-self: flex-start;
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            text-decoration: none;
-            padding: 16px 36px;
-            border-radius: 30px;
+        .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 75px;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
             font-weight: 600;
             letter-spacing: 0.5px;
-            transition: all 0.3s var(--nike-easing);
+            text-transform: uppercase;
+            opacity: 0.85;
+            margin-bottom: 2px;
         }
 
-        .hero-action-cta:hover {
-            background-color: var(--gold-accent);
-            color: white;
-            transform: translateY(-2px);
+        .player-label { color: #ffcc00; }
+        .ai-label { color: #ff3333; }
+
+        .score-value {
+            font-family: 'Orbitron', 'Noto Sans Georgian', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
         }
 
-        .hero-graphic-side {
-            position: relative;
-            background-color: var(--bg-main);
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        #player-score {
+            color: #ffcc00;
+            text-shadow: 0 0 14px rgba(255, 204, 0, 0.8);
         }
 
-        #hero-three-canvas {
-            width: 100%;
-            height: 100%;
+        #ai-score {
+            color: #ff3333;
+            text-shadow: 0 0 14px rgba(255, 51, 51, 0.8);
+        }
+
+        .divider {
+            width: 2px;
+            height: 36px;
+            background: linear-gradient(180deg, transparent, rgba(255,255,255,0.4), transparent);
+        }
+
+        #controls-bar {
             position: absolute;
-            top: 0;
-            left: 0;
-            outline: none;
-        }
-
-        /* --- STOREFRONT & CATALOG --- */
-        .storefront-body {
-            padding: 80px 5%;
-        }
-
-        .catalog-header {
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .catalog-header h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.2rem;
-            font-weight: 600;
-        }
-
-        .category-filter-pills {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-pill {
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 1px solid var(--border-line);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .filter-pill.active, .filter-pill:hover {
-            background-color: var(--gold-accent);
-            border-color: var(--gold-accent);
-            color: #fff;
-        }
-
-        .nike-product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .nike-product-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-line);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.4s var(--nike-easing), box-shadow 0.4s var(--nike-easing);
-            border-radius: 8px;
-        }
-
-        .nike-product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px var(--panel-shadow);
-        }
-
-        .card-media-box {
-            width: 100%;
-            height: 380px;
-            background-color: var(--bg-main);
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .card-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s var(--nike-easing);
-        }
-
-        .nike-product-card:hover .card-img {
-            transform: scale(1.06);
-        }
-
-        .card-meta-info {
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .card-meta-info h3 {
-            font-size: 1.15rem;
-            font-weight: 500;
-            margin-bottom: 6px;
-            cursor: pointer;
-        }
-
-        .card-item-tag {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .card-interaction-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-        }
-
-        .card-price-lbl {
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--gold-accent);
-        }
-
-        /* --- ABOUT US SECTION (3D CRYSTAL) --- */
-        .about-section {
-            padding: 100px 5%;
-            background-color: var(--bg-card);
-            border-top: 1px solid var(--border-line);
-            border-bottom: 1px solid var(--border-line);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .about-content h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.8rem;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
-
-        .about-content p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
-
-        .about-canvas-box {
-            width: 100%;
-            height: 450px;
-            position: relative;
-            background: var(--bg-main);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px var(--panel-shadow);
-        }
-
-        #about-three-canvas {
-            width: 100%;
-            height: 100%;
-            outline: none;
-        }
-
-        /* --- CONTACT & CONCIERGE SECTION --- */
-        .contact-section {
-            padding: 100px 5%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .contact-form-box {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-line);
-            padding: 45px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px var(--panel-shadow);
-        }
-
-        .contact-form-box h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-        }
-
-        .contact-form-box p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-        }
-
-        .contact-input-group {
-            margin-bottom: 20px;
-        }
-
-        .contact-input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .contact-input {
-            width: 100%;
-            padding: 14px 18px;
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-line);
-            color: var(--text-primary);
-            font-family: 'Poppins', sans-serif;
-            border-radius: 6px;
-            outline: none;
-            font-size: 0.95rem;
-            transition: border-color 0.3s;
-        }
-
-        .contact-input:focus {
-            border-color: var(--gold-accent);
-        }
-
-        textarea.contact-input {
-            resize: vertical;
-            height: 130px;
-        }
-
-        .contact-submit-btn {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s var(--nike-easing);
-        }
-
-        .contact-submit-btn:hover {
-            background-color: var(--gold-accent);
-            color: #fff;
-        }
-
-        .contact-canvas-box {
-            width: 100%;
-            height: 500px;
-            position: relative;
-            background: var(--bg-card);
-            border: 1px solid var(--border-line);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px var(--panel-shadow);
-        }
-
-        #contact-three-canvas {
-            width: 100%;
-            height: 100%;
-            outline: none;
-        }
-
-        /* --- SHOPPING BAG SIDEBAR --- */
-        .bag-drawer {
-            position: fixed;
-            top: 0;
-            right: -460px;
-            width: 100%;
-            max-width: 450px;
-            height: 100%;
-            background-color: var(--bg-card);
-            box-shadow: -10px 0 40px var(--panel-shadow);
-            z-index: 200;
-            transition: right 0.4s var(--nike-easing);
-        }
-
-        .bag-drawer.drawer-open {
-            right: 0;
-        }
-
-        .drawer-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 35px;
-        }
-
-        .drawer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-line);
-            padding-bottom: 20px;
-        }
-
-        .drawer-header h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-        }
-
-        .close-drawer-x {
-            background: transparent;
-            border: none;
-            font-size: 2.5rem;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-
-        .drawer-items-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-top: 20px;
-        }
-
-        .bag-item-node {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-line);
-        }
-
-        .drawer-checkout-footer {
-            border-top: 1px solid var(--border-line);
-            padding-top: 25px;
-        }
-
-        .subtotal-display {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .secure-checkout-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .secure-checkout-panel h4 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-
-        .luxury-input {
-            width: 100%;
-            padding: 12px 16px;
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-line);
-            color: var(--text-primary);
-            font-family: 'Poppins', sans-serif;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .luxury-input:focus {
-            border-color: var(--gold-accent);
-        }
-
-        .input-split-row {
-            display: flex;
-            gap: 12px;
-        }
-
-        .submit-checkout-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s var(--nike-easing);
-        }
-
-        .submit-checkout-btn:hover {
-            background-color: var(--gold-accent);
-            color: white;
-        }
-
-        /* --- PRODUCT VIEWER MODAL --- */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
+            gap: 14px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(24, 14, 8, 0.65);
             backdrop-filter: blur(8px);
-            z-index: 300;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .game-btn {
+            cursor: pointer;
+            font-family: 'Noto Sans Georgian', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff;
+            background: linear-gradient(135deg, #442816 0%, #29150d 100%);
+            border: 1px solid rgba(255, 204, 0, 0.45);
+            border-radius: 999px;
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            outline: none;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            border-color: #ffcc00;
+            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, #623202 0%, #381a12 100%);
+        }
+
+        .game-btn:active {
+            transform: translateY(1px) scale(0.97);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff3333 100%);
+            border: 1px solid #ffcc00;
+            font-size: 1.15rem;
+            padding: 14px 36px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff3333 100%);
+            box-shadow: 0 0 35px rgba(255, 204, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+        }
+
+        .overlay-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            background: rgba(18, 10, 5, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal-card {
+            background: linear-gradient(160deg, rgba(52, 28, 18, 0.92), rgba(26, 12, 8, 0.95));
+            border: 1px solid rgba(255, 204, 0, 0.35);
+            border-radius: 28px;
+            padding: 36px 32px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 204, 0, 0.15);
+            animation: floatIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .game-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ffcc00, #ffffff, #ff3333);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #d8c2a8;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .difficulty-group {
             display: flex;
             justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s var(--nike-easing);
+            gap: 10px;
+            margin-bottom: 26px;
         }
 
-        .modal-backdrop.modal-active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .product-viewer-container {
-            background-color: var(--bg-card);
-            width: 92%;
-            max-width: 1100px;
-            max-height: 85vh;
-            border-radius: 12px;
-            position: relative;
-            overflow-y: auto;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-
-        .close-modal-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: transparent;
-            border: none;
-            font-size: 2.2rem;
-            cursor: pointer;
-            color: var(--text-primary);
-            z-index: 10;
-        }
-
-        .modal-split-layout {
-            display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
-            gap: 35px;
-        }
-
-        .main-display-frame {
-            width: 100%;
-            height: 420px;
-            background-color: var(--bg-main);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .main-display-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .thumbnail-gallery-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .thumb-node {
-            width: 65px;
-            height: 65px;
-            object-fit: cover;
-            border-radius: 6px;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .thumb-node.active, .thumb-node:hover {
-            border-color: var(--text-primary);
-        }
-
-        .breadcrumb-trail {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .product-main-title {
-            font-size: 1.6rem;
+        .diff-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2d1cbd5;
+            font-family: 'Noto Sans Georgian', sans-serif;
             font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .product-price-tag {
-            font-size: 1.35rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--gold-accent);
-        }
-
-        .modal-divider-line {
-            border: 0;
-            height: 1px;
-            background-color: var(--border-line);
-            margin-bottom: 15px;
-        }
-
-        .attribute-selection-group {
-            margin-bottom: 15px;
-        }
-
-        .attribute-label {
-            display: block;
             font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .color-options-flex {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .color-pill {
-            padding: 6px 14px;
-            border: 1px solid var(--border-line);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85rem;
             transition: all 0.2s ease;
         }
 
-        .color-pill.selected {
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            border-color: var(--text-primary);
+        .diff-btn.active {
+            background: rgba(255, 204, 0, 0.2);
+            border-color: #ffcc00;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
         }
 
-        .size-options-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
+        .controls-hint {
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.82rem;
+            color: #bb9d88;
+            display: flex;
+            flex-direction: column;
             gap: 6px;
         }
 
-        .size-tile {
-            padding: 8px 0;
-            text-align: center;
-            border: 1px solid var(--border-line);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
+        #goal-banner {
+            position: absolute;
+            top: 32%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            z-index: 12;
+            font-size: 2.6rem;
+            font-weight: 800;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            text-shadow: 0 0 25px currentColor;
         }
 
-        .size-tile.selected {
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            border-color: var(--text-primary);
+        #goal-banner.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
         }
 
-        .quantity-picker-row {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border-line);
-            width: 110px;
-            border-radius: 4px;
-        }
-
-        .qty-math-btn {
-            width: 32px;
-            height: 32px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-size: 1rem;
-        }
-
-        .qty-current-val {
-            flex-grow: 1;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .modal-primary-buy-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--text-primary);
-            color: var(--bg-card);
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            transition: background-color 0.2s ease;
-        }
-
-        .modal-primary-buy-btn:hover {
-            background-color: var(--gold-accent);
-            color: #fff;
-        }
-
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-        @media (max-width: 960px) {
-            .nike-style-hero, .about-section, .contact-section {
-                grid-template-columns: 1fr;
+        @media (max-width: 600px) {
+            #hud-top {
+                top: 12px;
+                padding: 8px 18px;
+                gap: 16px;
             }
-            .hero-text-side {
-                padding: 60px 5%;
-                order: 2;
-            }
-            .hero-graphic-side {
-                height: 400px;
-                order: 1;
-            }
-            .nav-menu {
-                display: none; 
-            }
-            .modal-split-layout {
-                grid-template-columns: 1fr;
-            }
-            .product-viewer-container {
-                max-height: 95vh;
-            }
+            .score-value { font-size: 1.6rem; }
+            .game-title { font-size: 1.9rem; }
+            .modal-card { padding: 26px 20px; }
+            .game-btn { padding: 9px 14px; font-size: 0.85rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 10-SECOND CINEMATIC LOADING SCREEN -->
-    <div id="loader-screen">
-        <div id="loader-canvas-container"></div>
-        <div class="loader-brand">Città dell’amore</div>
-        <div class="loader-progress-bar-wrap">
-            <div class="loader-progress-fill" id="loader-fill"></div>
+<div id="game-wrapper">
+    <div id="hud-top">
+        <div class="score-box">
+            <span class="score-label player-label">მოთამაშე</span>
+            <span id="player-score" class="score-value">0</span>
         </div>
-        <div class="loader-percentage" id="loader-pct">0%</div>
+        <div class="divider"></div>
+        <div class="score-box">
+            <span class="score-label ai-label">კომპიუტერი</span>
+            <span id="ai-score" class="score-value">0</span>
+        </div>
     </div>
 
-    <!-- NAVIGATION -->
-    <nav class="luxury-nav">
-        <div class="logo">Città dell’amore</div>
-        <ul class="nav-menu">
-            <li><a href="#collection" class="menu-link active">Collection</a></li>
-            <li><a href="#about" class="menu-link">About Us</a></li>
-            <li><a href="#contact" class="menu-link">Contact</a></li>
-            <li><a href="#collection" class="menu-link">Matching Apparel</a></li>
-        </ul>
-        <div class="nav-utilities">
-            <button id="theme-toggle" class="nav-btn-secondary">🌙 Dark Reader</button>
-            <button id="cart-toggle" class="nav-btn-primary">Bag (<span id="cart-counter">0</span>)</button>
-        </div>
-    </nav>
+    <div id="goal-banner">გოლი!</div>
 
-    <!-- HERO SECTION WITH 3D SUN & MOON CANVAS -->
-    <header class="nike-style-hero">
-        <div class="hero-text-side">
-            <span class="hero-series-tag">SUN_NIGHT_AND_STARS • Official Shop</span>
-            <h1 class="hero-display-title">WELCOME TO THE SUN & MOON</h1>
-            <p class="hero-lead-text">Discover our exclusive celestial collection of couples bracelets, necklaces, luxury hoodies, and cosmic apparel crafted for eternity.</p>
-            <a href="#collection" class="hero-action-cta">Shop the Capsule</a>
-        </div>
-        <div class="hero-graphic-side">
-            <canvas id="hero-three-canvas"></canvas>
-        </div>
-    </header>
+    <div id="canvas-container"></div>
 
-    <!-- STOREFRONT CATALOG -->
-    <main class="storefront-body" id="collection">
-        <div class="catalog-header">
-            <h2>Trending Essentials</h2>
-            <div class="category-filter-pills">
-                <button class="filter-pill active" onclick="filterCatalog('all', this)">All Pieces</button>
-                <button class="filter-pill" onclick="filterCatalog('Jewelry', this)">Fine Jewelry</button>
-                <button class="filter-pill" onclick="filterCatalog('Apparel', this)">Matching Apparel</button>
-                <button class="filter-pill" onclick="filterCatalog('Accessories', this)">Accessories</button>
-            </div>
-        </div>
-        
-        <div class="nike-product-grid" id="products-root"></div>
-    </main>
+    <div id="controls-bar">
+        <button id="btn-pause" class="game-btn" title="პაუზა">
+            <span id="pause-icon">⏸</span> <span id="pause-text">პაუზა</span>
+        </button>
+        <button id="btn-restart" class="game-btn" title="თავიდან დაწყება">
+            <span>🔄</span> <span>თავიდან</span>
+        </button>
+        <button id="btn-sound" class="game-btn" title="ხმის ჩართვა/გამორთვა">
+            <span id="sound-icon">🔊</span> <span id="sound-text">ხმა</span>
+        </button>
+    </div>
 
-    <!-- ABOUT US SECTION WITH 3D CRYSTAL CANVAS -->
-    <section class="about-section" id="about">
-        <div class="about-content">
-            <h2>The Myth of Sun & Moon</h2>
-            <p>Born from the eternal dance between celestial light and midnight shadow, Città dell’amore represents the unbreakable bond between two souls destined across the cosmos.</p>
-            <p>Every piece in our boutique is meticulously engineered with refined golden accents, durable fabrics, and astronomical inspiration, making your love story timeless.</p>
-        </div>
-        <div class="about-canvas-box">
-            <canvas id="about-three-canvas"></canvas>
-        </div>
-    </section>
-
-    <!-- CONTACT & CONCIERGE SECTION WITH 3D ENVELOPE CANVAS -->
-    <section class="contact-section" id="contact">
-        <div class="contact-form-box">
-            <h2>Concierge & Inquiries</h2>
-            <p>Have a custom request or need assistance with your order? Our celestial concierge is at your service.</p>
-            <form id="contact-inquiry-form">
-                <div class="contact-input-group">
-                    <label>Your Name</label>
-                    <input type="text" class="contact-input" placeholder="e.g. Elena Rostova" required>
-                </div>
-                <div class="contact-input-group">
-                    <label>Email Address</label>
-                    <input type="email" class="contact-input" placeholder="elena@example.com" required>
-                </div>
-                <div class="contact-input-group">
-                    <label>Message</label>
-                    <textarea class="contact-input" placeholder="How can we assist your journey?" required></textarea>
-                </div>
-                <button type="submit" class="contact-submit-btn">Send Message</button>
-            </form>
-        </div>
-        <div class="contact-canvas-box">
-            <canvas id="contact-three-canvas"></canvas>
-        </div>
-    </section>
-
-    <!-- PRODUCT VIEWER MODAL -->
-    <div class="modal-backdrop" id="product-modal">
-        <div class="product-viewer-container">
-            <button class="close-modal-btn" id="close-modal-trigger">&times;</button>
+    <div id="start-screen" class="overlay-screen">
+        <div class="modal-card">
+            <h1 class="game-title">3D პონგი</h1>
+            <p class="subtitle">ნეონის არენა • პირველი 7 ქულამდე იგებს</p>
             
-            <div class="modal-split-layout">
-                <div class="viewer-media-side">
-                    <div class="main-display-frame">
-                        <img id="modal-main-img" src="" alt="Showcase View">
-                    </div>
-                    <div class="thumbnail-gallery-row">
-                        <img id="modal-thumb-1" class="thumb-node active" src="" alt="Preview 1">
-                        <img id="modal-thumb-2" class="thumb-node" src="" alt="Preview 2">
-                    </div>
-                </div>
+            <div style="margin-bottom: 10px; font-size: 0.85rem; color: #b89f94;">აირჩიეთ სირთულე:</div>
+            <div class="difficulty-group" id="difficulty-selector">
+                <button class="diff-btn" data-diff="easy">მარტივი</button>
+                <button class="diff-btn active" data-diff="medium">საშუალო</button>
+                <button class="diff-btn" data-diff="hard">რთული</button>
+            </div>
 
-                <div class="viewer-details-side">
-                    <nav class="breadcrumb-trail" id="modal-breadcrumb">Home > Shop</nav>
-                    <h1 class="product-main-title" id="modal-title">Product Name</h1>
-                    <div class="product-price-tag" id="modal-price">0.00 GEL</div>
+            <button id="btn-start" class="game-btn btn-primary">თამაშის დაწყება</button>
 
-                    <hr class="modal-divider-line">
-
-                    <div class="attribute-selection-group">
-                        <label class="attribute-label">ფერი / Color:</label>
-                        <div class="color-options-flex" id="modal-colors-box"></div>
-                    </div>
-
-                    <div class="attribute-selection-group">
-                        <label class="attribute-label">ზომა / Size:</label>
-                        <div class="size-options-grid" id="modal-sizes-box"></div>
-                    </div>
-
-                    <div class="attribute-selection-group">
-                        <label class="attribute-label">რაოდენობა / Quantity:</label>
-                        <div class="quantity-picker-row">
-                            <button class="qty-math-btn" onclick="adjustModalQty(-1)">-</button>
-                            <span class="qty-current-val" id="modal-qty-val">1</span>
-                            <button class="qty-math-btn" onclick="adjustModalQty(1)">+</button>
-                        </div>
-                    </div>
-                    <button class="modal-primary-buy-btn" id="modal-add-to-bag-btn">Add To Bag</button>
-                </div>
+            <div class="controls-hint">
+                <span>🖱️ მართვა: მაუსით, თითით (Touch) ან ⬅️ ➡️ / A-D ღილაკებით</span>
+                <span>🎯 დაარტყით ბურთს ჩოგნის კიდით კუთხის შესაცვლელად</span>
             </div>
         </div>
     </div>
 
-    <!-- SHOPPING BAG SIDEBAR -->
-    <aside class="bag-drawer" id="bag-sidebar">
-        <div class="drawer-content">
-            <div class="drawer-header">
-                <h3>Shopping Bag</h3>
-                <button id="close-bag" class="close-drawer-x">&times;</button>
-            </div>
-            
-            <div class="drawer-items-list" id="bag-items-target"></div>
-            
-            <div class="drawer-checkout-footer">
-                <div class="subtotal-display">
-                    <span>Subtotal</span>
-                    <span>$<span id="subtotal-val">0.00</span></span>
-                </div>
-                
-                <form id="checkout-form" class="secure-checkout-panel">
-                    <h4>Secure Checkout</h4>
-                    <input type="text" placeholder="Cardholder Name" required class="luxury-input">
-                    <input type="text" placeholder="Card Number" maxlength="16" required class="luxury-input">
-                    <div class="input-split-row">
-                        <input type="text" placeholder="MM/YY" maxlength="5" required class="luxury-input">
-                        <input type="text" placeholder="CVV" maxlength="3" required class="luxury-input">
-                    </div>
-                    <button type="submit" class="submit-checkout-btn">Complete Transaction</button>
-                </form>
+    <div id="pause-screen" class="overlay-screen hidden">
+        <div class="modal-card">
+            <h2 class="game-title">პაუზა</h2>
+            <p class="subtitle">თამაში დროებით შეჩერებულია</p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button id="btn-resume" class="game-btn btn-primary">გაგრძელება</button>
+                <button id="btn-pause-restart" class="game-btn">თავიდან დაწყება</button>
             </div>
         </div>
-    </aside>
+    </div>
 
-    <!-- SCRIPT LOGIC -->
-    <script>
-        // --- 10-SECOND CINEMATIC LOADER ---
-        window.addEventListener('DOMContentLoaded', () => {
-            const loaderFill = document.getElementById('loader-fill');
-            const loaderPct = document.getElementById('loader-pct');
-            const loaderScreen = document.getElementById('loader-screen');
+    <div id="gameover-screen" class="overlay-screen hidden">
+        <div class="modal-card">
+            <h2 id="winner-title" class="game-title">გამარჯვება!</h2>
+            <p id="final-score-text" class="subtitle">ანგარიში: 7 - 4</p>
+            <button id="btn-play-again" class="game-btn btn-primary">კიდევ თამაში</button>
+        </div>
+    </div>
+</div>
 
-            // Three.js loader canvas (Eclipse animation)
-            const loaderContainer = document.getElementById('loader-canvas-container');
-            const lScene = new THREE.Scene();
-            const lCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-            lCamera.position.z = 5;
-            const lRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            lRenderer.setSize(loaderContainer.clientWidth, loaderContainer.clientHeight);
-            loaderContainer.appendChild(lRenderer.domElement);
+<script>
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.muted = false;
+    }
 
-            const lSunGeo = new THREE.SphereGeometry(1, 32, 32);
-            const lSunMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-            const lSun = new THREE.Mesh(lSunGeo, lSunMat);
-            lScene.add(lSun);
-
-            const lMoonGeo = new THREE.SphereGeometry(0.95, 32, 32);
-            const lMoonMat = new THREE.MeshBasicMaterial({ color: 0x050508 });
-            const lMoon = new THREE.Mesh(lMoonGeo, lMoonMat);
-            lMoon.position.set(-2.5, 0, 0.5);
-            lScene.add(lMoon);
-
-            let lAnimId;
-            function animateLoaderScene() {
-                lAnimId = requestAnimationFrame(animateLoaderScene);
-                lMoon.position.x += 0.015;
-                if (lMoon.position.x > 2.5) lMoon.position.x = -2.5;
-                lRenderer.render(lScene, lCamera);
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                this.ctx = new AudioContext();
             }
-            animateLoaderScene();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    }
 
-            let currentPct = 0;
-            // 10 seconds total loading time (10,000ms / 100 intervals = 100ms)
-            const intervalTime = 100; 
-            const increment = 1;
+    toggleMute() {
+        this.muted = !this.muted;
+        return this.muted;
+    }
 
-            const loadTimer = setInterval(() => {
-                currentPct += increment;
-                if (currentPct > 100) currentPct = 100;
-                loaderFill.style.width = currentPct + '%';
-                loaderPct.innerText = currentPct + '%';
+    playTone(freq, type, duration, volume = 0.2, slideTo = null) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
 
-                if (currentPct === 100) {
-                    clearInterval(loadTimer);
-                    cancelAnimationFrame(lAnimId);
-                    setTimeout(() => {
-                        loaderScreen.style.opacity = '0';
-                        setTimeout(() => loaderScreen.style.display = 'none', 1000);
-                    }, 500);
+        try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            if (slideTo) {
+                osc.frequency.exponentialRampToValueAtTime(slideTo, this.ctx.currentTime + duration);
+            }
+
+            gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start();
+            osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {
+        }
+    }
+
+    playPaddleHit(isPlayer) {
+        this.playTone(isPlayer ? 520 : 420, 'triangle', 0.14, 0.25, isPlayer ? 780 : 600);
+    }
+
+    playWallHit() {
+        this.playTone(260, 'sine', 0.09, 0.18, 180);
+    }
+
+    playScore(playerScored) {
+        if (playerScored) {
+            this.playTone(440, 'sine', 0.15, 0.25);
+            setTimeout(() => this.playTone(660, 'sine', 0.25, 0.25), 110);
+        } else {
+            this.playTone(300, 'sawtooth', 0.2, 0.2, 140);
+        }
+    }
+
+    playWin(didWin) {
+        const notes = didWin ? [523.25, 659.25, 783.99, 1046.50] : [392.00, 349.23, 311.13, 261.63];
+        notes.forEach((n, idx) => {
+            setTimeout(() => this.playTone(n, 'triangle', 0.28, 0.25), idx * 130);
+        });
+    }
+}
+
+const CONFIG = {
+    WIN_SCORE: 7,
+    TABLE_WIDTH: 14,
+    TABLE_LENGTH: 24,
+    WALL_HEIGHT: 0.8,
+    PADDLE_WIDTH: 3.0,
+    PADDLE_HEIGHT: 0.65,
+    PADDLE_DEPTH: 0.55,
+    PADDLE_Z_OFFSET: 10.6,
+    BALL_RADIUS: 0.42,
+    BASE_BALL_SPEED: 15.5,
+    MAX_BALL_SPEED: 32.0,
+    SPEED_INCREMENT: 0.85,
+    DIFFICULTIES: {
+        easy:   { aiSpeed: 8.5,  aiReaction: 0.06, errorMargin: 0.9 },
+        medium: { aiSpeed: 13.5, aiReaction: 0.11, errorMargin: 0.4 },
+        hard:   { aiSpeed: 19.5, aiReaction: 0.18, errorMargin: 0.12 }
+    }
+};
+
+class Pong3DGame {
+    constructor() {
+        this.sound = new SoundEngine();
+        this.container = document.getElementById('canvas-container');
+
+        this.state = 'MENU';
+        this.difficulty = 'medium';
+        this.playerScore = 0;
+        this.aiScore = 0;
+        this.goalTimer = 0;
+        this.screenShake = 0;
+
+        this.playerX = 0;
+        this.targetPlayerX = 0;
+        this.prevPlayerX = 0;
+        this.playerVelocityX = 0;
+
+        this.aiX = 0;
+        this.aiTargetX = 0;
+
+        this.ballPos = new THREE.Vector3(0, CONFIG.BALL_RADIUS, 0);
+        this.ballVel = new THREE.Vector3(0, 0, 0);
+        this.ballSpeed = CONFIG.BASE_BALL_SPEED;
+        this.ballSpin = 0;
+
+        this.keys = { left: false, right: false };
+        this.raycaster = new THREE.Raycaster();
+        this.pointer = new THREE.Vector2();
+        this.dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+        this.particles = [];
+
+        this.initThree();
+        this.buildArena();
+        this.buildEntities();
+        this.bindEvents();
+
+        this.clock = new THREE.Clock();
+        this.animate = this.animate.bind(this);
+    }
+
+    initThree() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x0d0905);
+        this.scene.fog = new THREE.FogExp2(0x0d0905, 0.022);
+
+        const width = this.container.clientWidth || window.innerWidth;
+        const height = this.container.clientHeight || window.innerHeight;
+        this.camera = new THREE.PerspectiveCamera(48, width / height, 0.1, 120);
+        this.baseCamPos = new THREE.Vector3(0, 13.5, 20.5);
+        this.camera.position.copy(this.baseCamPos);
+        this.camera.lookAt(0, 0, -1.5);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.container.appendChild(this.renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0x7a5a3a, 1.1);
+        this.scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+        dirLight.position.set(8, 22, 12);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.camera.near = 2;
+        dirLight.shadow.camera.far = 50;
+        const d = 16;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        this.scene.add(dirLight);
+
+        this.ballLight = new THREE.PointLight(0xffcc00, 1.8, 12);
+        this.scene.add(this.ballLight);
+    }
+
+    buildArena() {
+        const gridHelper = new THREE.GridHelper(80, 40, 0x472e16, 0x26140b);
+        gridHelper.position.y = -0.6;
+        this.scene.add(gridHelper);
+
+        const tableGeo = new THREE.BoxGeometry(CONFIG.TABLE_WIDTH, 0.5, CONFIG.TABLE_LENGTH);
+        const tableMat = new THREE.MeshStandardMaterial({
+            color: 0x24140b,
+            roughness: 0.25,
+            metalness: 0.65
+        });
+        const table = new THREE.Mesh(tableGeo, tableMat);
+        table.position.y = -0.25;
+        table.receiveShadow = true;
+        this.scene.add(table);
+
+        const centerLineGeo = new THREE.PlaneGeometry(CONFIG.TABLE_WIDTH - 0.6, 0.14);
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0x6e481e, transparent: true, opacity: 0.65 });
+        const centerLine = new THREE.Mesh(centerLineGeo, lineMat);
+        centerLine.rotation.x = -Math.PI / 2;
+        centerLine.position.y = 0.01;
+        this.scene.add(centerLine);
+
+        const ringGeo = new THREE.RingGeometry(2.2, 2.35, 48);
+        const ringMesh = new THREE.Mesh(ringGeo, lineMat);
+        ringMesh.rotation.x = -Math.PI / 2;
+        ringMesh.position.y = 0.01;
+        this.scene.add(ringMesh);
+
+        const wallGeo = new THREE.BoxGeometry(0.35, CONFIG.WALL_HEIGHT, CONFIG.TABLE_LENGTH);
+        const wallMat = new THREE.MeshStandardMaterial({
+            color: 0xffcc00,
+            emissive: 0xcc8800,
+            emissiveIntensity: 0.9,
+            roughness: 0.2
+        });
+
+        const leftWall = new THREE.Mesh(wallGeo, wallMat);
+        leftWall.position.set(-CONFIG.TABLE_WIDTH / 2 - 0.175, CONFIG.WALL_HEIGHT / 2 - 0.1, 0);
+        leftWall.castShadow = true;
+        leftWall.receiveShadow = true;
+        this.scene.add(leftWall);
+
+        const rightWall = new THREE.Mesh(wallGeo, wallMat);
+        rightWall.position.set(CONFIG.TABLE_WIDTH / 2 + 0.175, CONFIG.WALL_HEIGHT / 2 - 0.1, 0);
+        rightWall.castShadow = true;
+        rightWall.receiveShadow = true;
+        this.scene.add(rightWall);
+
+        const goalStripGeo = new THREE.BoxGeometry(CONFIG.TABLE_WIDTH, 0.06, 0.18);
+        const playerGoalMat = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+        const aiGoalMat = new THREE.MeshBasicMaterial({ color: 0xff3333 });
+
+        const playerGoalLine = new THREE.Mesh(goalStripGeo, playerGoalMat);
+        playerGoalLine.position.set(0, 0.01, CONFIG.TABLE_LENGTH / 2 - 0.1);
+        this.scene.add(playerGoalLine);
+
+        const aiGoalLine = new THREE.Mesh(goalStripGeo, aiGoalMat);
+        aiGoalLine.position.set(0, 0.01, -CONFIG.TABLE_LENGTH / 2 + 0.1);
+        this.scene.add(aiGoalLine);
+    }
+
+    buildEntities() {
+        const paddleGeo = new THREE.BoxGeometry(CONFIG.PADDLE_WIDTH, CONFIG.PADDLE_HEIGHT, CONFIG.PADDLE_DEPTH);
+        const playerMat = new THREE.MeshStandardMaterial({
+            color: 0xffcc00,
+            emissive: 0xffaa00,
+            emissiveIntensity: 0.75,
+            roughness: 0.2,
+            metalness: 0.3
+        });
+        this.playerPaddle = new THREE.Mesh(paddleGeo, playerMat);
+        this.playerPaddle.position.set(0, CONFIG.PADDLE_HEIGHT / 2, CONFIG.PADDLE_Z_OFFSET);
+        this.playerPaddle.castShadow = true;
+        this.playerPaddle.receiveShadow = true;
+        this.scene.add(this.playerPaddle);
+
+        const aiMat = new THREE.MeshStandardMaterial({
+            color: 0xff3333,
+            emissive: 0xcc0000,
+            emissiveIntensity: 0.75,
+            roughness: 0.2,
+            metalness: 0.3
+        });
+        this.aiPaddle = new THREE.Mesh(paddleGeo, aiMat);
+        this.aiPaddle.position.set(0, CONFIG.PADDLE_HEIGHT / 2, -CONFIG.PADDLE_Z_OFFSET);
+        this.aiPaddle.castShadow = true;
+        this.aiPaddle.receiveShadow = true;
+        this.scene.add(this.aiPaddle);
+
+        const ballGeo = new THREE.SphereGeometry(CONFIG.BALL_RADIUS, 28, 28);
+        const ballMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            emissive: 0xfff080,
+            emissiveIntensity: 0.9,
+            roughness: 0.1
+        });
+        this.ballMesh = new THREE.Mesh(ballGeo, ballMat);
+        this.ballMesh.castShadow = true;
+        this.ballMesh.position.copy(this.ballPos);
+        this.scene.add(this.ballMesh);
+
+        const haloGeo = new THREE.RingGeometry(CONFIG.BALL_RADIUS * 1.1, CONFIG.BALL_RADIUS * 1.45, 24);
+        const haloMat = new THREE.MeshBasicMaterial({
+            color: 0xffcc00,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.55
+        });
+        this.ballHalo = new THREE.Mesh(haloGeo, haloMat);
+        this.ballHalo.rotation.x = -Math.PI / 2;
+        this.ballHalo.position.y = 0.03;
+        this.scene.add(this.ballHalo);
+    }
+
+    spawnParticles(position, colorHex, count = 18) {
+        const geo = new THREE.BoxGeometry(0.16, 0.16, 0.16);
+        const mat = new THREE.MeshBasicMaterial({ color: colorHex });
+
+        for (let i = 0; i < count; i++) {
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.copy(position);
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * 6;
+            const vel = new THREE.Vector3(
+                Math.cos(angle) * speed,
+                1.5 + Math.random() * 4.5,
+                Math.sin(angle) * speed
+            );
+            this.scene.add(mesh);
+            this.particles.push({ mesh, vel, life: 1.0 });
+        }
+    }
+
+    updateParticles(dt) {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.life -= dt * 2.4;
+            if (p.life <= 0) {
+                this.scene.remove(p.mesh);
+                this.particles.splice(i, 1);
+            } else {
+                p.vel.y -= 12 * dt;
+                p.mesh.position.addScaledVector(p.vel, dt);
+                p.mesh.rotation.x += 5 * dt;
+                p.mesh.rotation.y += 5 * dt;
+                p.mesh.scale.setScalar(Math.max(0.01, p.life));
+            }
+        }
+    }
+
+    resetBall(serveToPlayer = true) {
+        this.ballPos.set(0, CONFIG.BALL_RADIUS, 0);
+        this.ballSpeed = CONFIG.BASE_BALL_SPEED;
+        this.ballSpin = 0;
+
+        const angle = (Math.random() - 0.5) * 0.95;
+        const dirZ = serveToPlayer ? 1 : -1;
+        this.ballVel.set(
+            Math.sin(angle) * this.ballSpeed,
+            0,
+            Math.cos(angle) * this.ballSpeed * dirZ
+        );
+        this.ballMesh.position.copy(this.ballPos);
+    }
+
+    startNewGame() {
+        this.sound.init();
+        this.playerScore = 0;
+        this.aiScore = 0;
+        this.updateScoreUI();
+
+        this.playerX = 0;
+        this.targetPlayerX = 0;
+        this.aiX = 0;
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('pause-screen').classList.add('hidden');
+        document.getElementById('gameover-screen').classList.add('hidden');
+
+        this.state = 'PLAYING';
+        this.resetBall(Math.random() > 0.5);
+    }
+
+    togglePause() {
+        if (this.state === 'PLAYING') {
+            this.state = 'PAUSED';
+            document.getElementById('pause-screen').classList.remove('hidden');
+            document.getElementById('pause-icon').textContent = '▶';
+            document.getElementById('pause-text').textContent = 'გაგრძელება';
+        } else if (this.state === 'PAUSED') {
+            this.state = 'PLAYING';
+            document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('pause-icon').textContent = '⏸';
+            document.getElementById('pause-text').textContent = 'პაუზა';
+            this.clock.getDelta();
+        }
+    }
+
+    updateScoreUI() {
+        document.getElementById('player-score').textContent = this.playerScore;
+        document.getElementById('ai-score').textContent = this.aiScore;
+    }
+
+    showGoalBanner(text, color) {
+        const banner = document.getElementById('goal-banner');
+        banner.textContent = text;
+        banner.style.color = color;
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 950);
+    }
+
+    handleGoal(playerScored) {
+        this.sound.playScore(playerScored);
+        this.screenShake = 0.45;
+
+        if (playerScored) {
+            this.playerScore++;
+            this.spawnParticles(this.ballPos, 0xffcc00, 32);
+            this.showGoalBanner('ქულა თქვენია!', '#ffcc00');
+        } else {
+            this.aiScore++;
+            this.spawnParticles(this.ballPos, 0xff3333, 32);
+            this.showGoalBanner('ქულა კომპიუტერს!', '#ff3333');
+        }
+
+        this.updateScoreUI();
+
+        if (this.playerScore >= CONFIG.WIN_SCORE || this.aiScore >= CONFIG.WIN_SCORE) {
+            this.state = 'GAMEOVER';
+            const didWin = this.playerScore >= CONFIG.WIN_SCORE;
+            this.sound.playWin(didWin);
+
+            const titleEl = document.getElementById('winner-title');
+            titleEl.textContent = didWin ? 'გილოცავთ, მოიგეთ! 🏆' : 'სამწუხაროდ, წააგეთ!';
+            document.getElementById('final-score-text').textContent =
+                `საბოლოო ანგარიში: ${this.playerScore} - ${this.aiScore}`;
+            document.getElementById('gameover-screen').classList.remove('hidden');
+            return;
+        }
+
+        this.state = 'GOAL_DELAY';
+        this.goalTimer = 1.05;
+        this.nextServeToPlayer = !playerScored;
+        this.ballMesh.visible = false;
+        this.ballHalo.visible = false;
+    }
+
+    updatePhysics(dt) {
+        const maxPaddleX = (CONFIG.TABLE_WIDTH / 2) - (CONFIG.PADDLE_WIDTH / 2) - 0.1;
+
+        const keySpeed = 19.0;
+        if (this.keys.left) this.targetPlayerX -= keySpeed * dt;
+        if (this.keys.right) this.targetPlayerX += keySpeed * dt;
+        this.targetPlayerX = Math.max(-maxPaddleX, Math.min(maxPaddleX, this.targetPlayerX));
+
+        this.prevPlayerX = this.playerX;
+        this.playerX += (this.targetPlayerX - this.playerX) * Math.min(1, dt * 22);
+        this.playerVelocityX = (this.playerX - this.prevPlayerX) / Math.max(dt, 0.001);
+        this.playerPaddle.position.x = this.playerX;
+
+        this.playerPaddle.rotation.z = -this.playerVelocityX * 0.012;
+
+        const diffSettings = CONFIG.DIFFICULTIES[this.difficulty];
+        if (this.ballVel.z < 0) {
+            const timeToReach = Math.abs((-CONFIG.PADDLE_Z_OFFSET - this.ballPos.z) / this.ballVel.z);
+            let predictedX = this.ballPos.x + this.ballVel.x * timeToReach;
+            const halfW = CONFIG.TABLE_WIDTH / 2 - CONFIG.BALL_RADIUS;
+            if (predictedX > halfW) predictedX = halfW - (predictedX - halfW);
+            if (predictedX < -halfW) predictedX = -halfW - (predictedX + halfW);
+
+            const wobble = Math.sin(performance.now() * 0.004) * diffSettings.errorMargin;
+            this.aiTargetX = predictedX + wobble;
+        } else {
+            this.aiTargetX = 0;
+        }
+
+        this.aiTargetX = Math.max(-maxPaddleX, Math.min(maxPaddleX, this.aiTargetX));
+        const aiDiff = this.aiTargetX - this.aiX;
+        const aiStep = Math.sign(aiDiff) * Math.min(Math.abs(aiDiff), diffSettings.aiSpeed * dt);
+        this.aiX += aiStep;
+        this.aiPaddle.position.x = this.aiX;
+
+        this.ballVel.x += this.ballSpin * dt * 6.5;
+        this.ballPos.addScaledVector(this.ballVel, dt);
+
+        const wallLimit = (CONFIG.TABLE_WIDTH / 2) - CONFIG.BALL_RADIUS;
+        if (this.ballPos.x <= -wallLimit) {
+            this.ballPos.x = -wallLimit;
+            this.ballVel.x = Math.abs(this.ballVel.x);
+            this.ballSpin *= -0.5;
+            this.sound.playWallHit();
+            this.spawnParticles(this.ballPos, 0xffcc00, 10);
+        } else if (this.ballPos.x >= wallLimit) {
+            this.ballPos.x = wallLimit;
+            this.ballVel.x = -Math.abs(this.ballVel.x);
+            this.ballSpin *= -0.5;
+            this.sound.playWallHit();
+            this.spawnParticles(this.ballPos, 0xffcc00, 10);
+        }
+
+        const hitHalfWidth = (CONFIG.PADDLE_WIDTH / 2) + CONFIG.BALL_RADIUS * 0.85;
+        const paddleFrontZ = CONFIG.PADDLE_Z_OFFSET - (CONFIG.PADDLE_DEPTH / 2) - CONFIG.BALL_RADIUS;
+
+        if (
+            this.ballVel.z > 0 &&
+            this.ballPos.z >= paddleFrontZ &&
+            this.ballPos.z <= CONFIG.PADDLE_Z_OFFSET + CONFIG.PADDLE_DEPTH
+        ) {
+            if (Math.abs(this.ballPos.x - this.playerX) <= hitHalfWidth) {
+                this.ballPos.z = paddleFrontZ;
+                this.reflectBallFromPaddle(this.playerX, this.playerVelocityX, true);
+            }
+        }
+
+        const aiFrontZ = -CONFIG.PADDLE_Z_OFFSET + (CONFIG.PADDLE_DEPTH / 2) + CONFIG.BALL_RADIUS;
+        if (
+            this.ballVel.z < 0 &&
+            this.ballPos.z <= aiFrontZ &&
+            this.ballPos.z >= -CONFIG.PADDLE_Z_OFFSET - CONFIG.PADDLE_DEPTH
+        ) {
+            if (Math.abs(this.ballPos.x - this.aiX) <= hitHalfWidth) {
+                this.ballPos.z = aiFrontZ;
+                this.reflectBallFromPaddle(this.aiX, 0, false);
+            }
+        }
+
+        const goalLimitZ = (CONFIG.TABLE_LENGTH / 2) + CONFIG.BALL_RADIUS;
+        if (this.ballPos.z > goalLimitZ) {
+            this.handleGoal(false);
+        } else if (this.ballPos.z < -goalLimitZ) {
+            this.handleGoal(true);
+        }
+
+        this.ballMesh.position.copy(this.ballPos);
+        this.ballHalo.position.set(this.ballPos.x, 0.03, this.ballPos.z);
+        this.ballLight.position.set(this.ballPos.x, 1.8, this.ballPos.z);
+    }
+
+    reflectBallFromPaddle(paddleX, paddleVelX, isPlayer) {
+        this.ballSpeed = Math.min(CONFIG.MAX_BALL_SPEED, this.ballSpeed + CONFIG.SPEED_INCREMENT);
+
+        const relativeIntersectX = (this.ballPos.x - paddleX) / (CONFIG.PADDLE_WIDTH / 2);
+        const clampedOffset = Math.max(-1.1, Math.min(1.1, relativeIntersectX));
+
+        const bounceAngle = clampedOffset * (Math.PI / 3.4);
+        const dirZ = isPlayer ? -1 : 1;
+
+        this.ballVel.x = Math.sin(bounceAngle) * this.ballSpeed;
+        this.ballVel.z = Math.cos(bounceAngle) * this.ballSpeed * dirZ;
+
+        this.ballSpin = Math.max(-1.8, Math.min(1.8, paddleVelX * 0.06));
+
+        this.sound.playPaddleHit(isPlayer);
+        const color = isPlayer ? 0xffcc00 : 0xff3333;
+        this.ballLight.color.setHex(color);
+        this.ballHalo.material.color.setHex(color);
+        this.spawnParticles(this.ballPos, color, 20);
+        this.screenShake = 0.16;
+
+        const paddle = isPlayer ? this.playerPaddle : this.aiPaddle;
+        paddle.scale.set(1.08, 1.15, 0.85);
+    }
+
+    updateVisualPolish(dt) {
+        this.playerPaddle.scale.lerp(new THREE.Vector3(1, 1, 1), Math.min(1, dt * 15));
+        this.aiPaddle.scale.lerp(new THREE.Vector3(1, 1, 1), Math.min(1, dt * 15));
+
+        const targetCamX = this.playerX * 0.22;
+        this.camera.position.x += (targetCamX - this.camera.position.x) * Math.min(1, dt * 6);
+        this.camera.position.y = this.baseCamPos.y;
+        this.camera.position.z = this.baseCamPos.z;
+
+        if (this.screenShake > 0) {
+            this.camera.position.x += (Math.random() - 0.5) * this.screenShake;
+            this.camera.position.y += (Math.random() - 0.5) * this.screenShake;
+            this.screenShake = Math.max(0, this.screenShake - dt * 2.2);
+        }
+        this.camera.lookAt(this.playerX * 0.1, 0, -1.5);
+    }
+
+    animate() {
+        requestAnimationFrame(this.animate);
+
+        const dt = Math.min(this.clock.getDelta(), 0.05);
+
+        if (this.state === 'PLAYING') {
+            this.updatePhysics(dt);
+        } else if (this.state === 'GOAL_DELAY') {
+            this.goalTimer -= dt;
+            if (this.goalTimer <= 0) {
+                this.ballMesh.visible = true;
+                this.ballHalo.visible = true;
+                this.resetBall(this.nextServeToPlayer);
+                this.state = 'PLAYING';
+            }
+        } else if (this.state === 'MENU') {
+            const t = performance.now() * 0.0005;
+            this.camera.position.x = Math.sin(t) * 3.5;
+            this.camera.lookAt(0, 0, -1.5);
+        }
+
+        this.updateParticles(dt);
+        if (this.state !== 'MENU') {
+            this.updateVisualPolish(dt);
+        }
+
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    updatePointerTarget(clientX, clientY) {
+        const rect = this.renderer.domElement.getBoundingClientRect();
+        this.pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+        this.pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        const intersectPoint = new THREE.Vector3();
+        if (this.raycaster.ray.intersectPlane(this.dragPlane, intersectPoint)) {
+            this.targetPlayerX = intersectPoint.x;
+        }
+    }
+
+    bindEvents() {
+        window.addEventListener('mousemove', (e) => {
+            if (this.state === 'PLAYING' || this.state === 'GOAL_DELAY') {
+                this.updatePointerTarget(e.clientX, e.clientY);
+            }
+        });
+
+        const handleTouch = (e) => {
+            if (e.touches && e.touches.length > 0) {
+                if (this.state === 'PLAYING' || this.state === 'GOAL_DELAY') {
+                    this.updatePointerTarget(e.touches[0].clientX, e.touches[0].clientY);
                 }
-            }, 100);
-        });
-
-        // --- INVENTORY DATA ---
-        const amoreInventory = [
-            {
-                id: 201,
-                name: "Eternity Sun Pendant",
-                segment: "Fine Jewelry / Necklaces",
-                category: "Jewelry",
-                price: 145.00,
-                imgUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80",
-                colors: ["Gold", "Silver"],
-                sizes: ["One Size"]
-            },
-            {
-                id: 202,
-                name: "Midnight Moon Bracelet",
-                segment: "Fine Jewelry / Bracelets",
-                category: "Jewelry",
-                price: 95.00,
-                imgUrl: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80",
-                colors: ["Midnight Black", "Rose Gold"],
-                sizes: ["Adjustable"]
-            },
-            {
-                id: 203,
-                name: "Città Promise Ring Set",
-                segment: "Studio Luxury / Rings",
-                category: "Jewelry",
-                price: 210.00,
-                imgUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80",
-                colors: ["Silver", "Gold"],
-                sizes: ["5", "6", "7", "8", "9"]
-            },
-            {
-                id: 204,
-                name: "Oversized 'Amore' Heavy Hoodie",
-                segment: "Apparel / Matching Hoodies",
-                category: "Apparel",
-                price: 85.00,
-                imgUrl: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80",
-                colors: ["Black", "Desert Sand", "Cream White"],
-                sizes: ["S", "M", "L", "XL", "2XL"]
-            },
-            {
-                id: 205,
-                name: "Cosmic Alignment Sweatshirt",
-                segment: "Apparel / Sweatshirts",
-                category: "Apparel",
-                price: 70.00,
-                imgUrl: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=600&q=80",
-                colors: ["Navy Blue", "Charcoal Gray", "White"],
-                sizes: ["S", "M", "L", "XL"]
-            },
-            {
-                id: 206,
-                name: "Constellation Shield Case",
-                segment: "Accessories / Phone Cases",
-                category: "Accessories",
-                price: 40.00,
-                imgUrl: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=600&q=80",
-                colors: ["Clear Cosmic", "Matte Black"],
-                sizes: ["iPhone 13", "iPhone 14", "iPhone 15", "iPhone 15 Pro"]
             }
-        ];
-
-        let reactiveBag = [];
-        let currentSelectedProduct = null;
-        let currentModalQty = 1;
-        let selectedColorStr = "";
-        let selectedSizeStr = "";
-
-        // --- RENDER CATALOG ---
-        const productsGridRoot = document.getElementById('products-root');
-
-        function initializeCatalogDisplay(filter = 'all') {
-            const filtered = filter === 'all' ? amoreInventory : amoreInventory.filter(i => i.category === filter);
-            productsGridRoot.innerHTML = filtered.map(item => `
-                <article class="nike-product-card">
-                    <div class="card-media-box" onclick="openProductModal(${item.id})">
-                        <img src="${item.imgUrl}" alt="${item.name}" class="card-img" loading="lazy">
-                    </div>
-                    <div class="card-meta-info">
-                        <div onclick="openProductModal(${item.id})">
-                            <h3>${item.name}</h3>
-                            <p class="card-item-tag">${item.segment}</p>
-                        </div>
-                        <div class="card-interaction-row">
-                            <span class="card-price-lbl">$${item.price.toFixed(2)}</span>
-                            <button class="nav-btn-primary" onclick="openProductModal(${item.id})">View Details</button>
-                        </div>
-                    </div>
-                </article>
-            `).join('');
-        }
-
-        window.filterCatalog = function(category, btnElement) {
-            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
-            initializeCatalogDisplay(category);
         };
+        this.container.addEventListener('touchstart', handleTouch, { passive: true });
+        this.container.addEventListener('touchmove', handleTouch, { passive: true });
 
-        // --- THREE.JS 1: HERO SUN & MOON ---
-        const heroContainer = document.querySelector('.hero-graphic-side');
-        const hScene = new THREE.Scene();
-        const hCamera = new THREE.PerspectiveCamera(60, heroContainer.clientWidth / heroContainer.clientHeight, 0.1, 1000);
-        hCamera.position.z = 6;
-        const hRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-three-canvas'), alpha: true, antialias: true });
-        hRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
-
-        const hAmbient = new THREE.AmbientLight(0xffffff, 1);
-        hScene.add(hAmbient);
-        const hPointLight = new THREE.PointLight(0xffd700, 2, 50);
-        hPointLight.position.set(5, 5, 5);
-        hScene.add(hPointLight);
-
-        // Sun Mesh
-        const sunGeo = new THREE.SphereGeometry(1.2, 32, 32);
-        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xaa8c2c, roughness: 0.3 });
-        const sunMesh = new THREE.Mesh(sunGeo, sunMat);
-        sunMesh.position.set(-1.2, 0, 0);
-        hScene.add(sunMesh);
-
-        // Moon Mesh
-        const moonGeo = new THREE.SphereGeometry(1.0, 32, 32);
-        const moonMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.8 });
-        const moonMesh = new THREE.Mesh(moonGeo, moonMat);
-        moonMesh.position.set(1.2, 0, 0);
-        hScene.add(moonMesh);
-
-        // Orbital Ring
-        const ringGeo = new THREE.RingGeometry(2.2, 2.25, 64);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4af37, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
-        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        ringMesh.rotation.x = Math.PI / 3;
-        hScene.add(ringMesh);
-
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) - 0.5;
-            mouseY = (e.clientY / window.innerHeight) - 0.5;
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === 'ა') {
+                this.keys.left = true;
+            }
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'დ') {
+                this.keys.right = true;
+            }
+            if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+                if (this.state === 'PLAYING' || this.state === 'PAUSED') {
+                    this.togglePause();
+                }
+            }
         });
 
-        function animateHero() {
-            requestAnimationFrame(animateHero);
-            sunMesh.rotation.y += 0.005;
-            moonMesh.rotation.y -= 0.005;
-            ringMesh.rotation.z += 0.002;
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === 'ა') {
+                this.keys.left = false;
+            }
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'დ') {
+                this.keys.right = false;
+            }
+        });
 
-            hCamera.position.x += (mouseX * 1.5 - hCamera.position.x) * 0.05;
-            hCamera.position.y += (-mouseY * 1.5 - hCamera.position.y) * 0.05;
-            hCamera.lookAt(hScene.position);
-
-            hRenderer.render(hScene, hCamera);
-        }
-        animateHero();
-
-        // --- THREE.JS 2: ABOUT US GOLDEN CRYSTAL ---
-        const aboutContainer = document.querySelector('.about-canvas-box');
-        const aScene = new THREE.Scene();
-        const aCamera = new THREE.PerspectiveCamera(60, aboutContainer.clientWidth / aboutContainer.clientHeight, 0.1, 1000);
-        aCamera.position.z = 4.5;
-        const aRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('about-three-canvas'), alpha: true, antialias: true });
-        aRenderer.setSize(aboutContainer.clientWidth, aboutContainer.clientHeight);
-
-        const aLight = new THREE.DirectionalLight(0xffd700, 2);
-        aLight.position.set(2, 4, 3);
-        aScene.add(aLight);
-        aScene.add(new THREE.AmbientLight(0xffffff, 0.8));
-
-        const crystalGeo = new THREE.IcosahedronGeometry(1.5, 0);
-        const crystalMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.2, metalness: 0.9, wireframe: false });
-        const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
-        aScene.add(crystalMesh);
-
-        function animateAbout() {
-            requestAnimationFrame(animateAbout);
-            crystalMesh.rotation.x += 0.008;
-            crystalMesh.rotation.y += 0.012;
-            aRenderer.render(aScene, aCamera);
-        }
-        animateAbout();
-
-        // --- THREE.JS 3: CONTACT FLOATING PRISM ---
-        const contactContainer = document.querySelector('.contact-canvas-box');
-        const cScene = new THREE.Scene();
-        const cCamera = new THREE.PerspectiveCamera(60, contactContainer.clientWidth / contactContainer.clientHeight, 0.1, 1000);
-        cCamera.position.z = 4.5;
-        const cRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('contact-three-canvas'), alpha: true, antialias: true });
-        cRenderer.setSize(contactContainer.clientWidth, contactContainer.clientHeight);
-
-        const cLight = new THREE.PointLight(0xffd700, 3, 50);
-        cLight.position.set(3, 3, 3);
-        cScene.add(cLight);
-        cScene.add(new THREE.AmbientLight(0xffffff, 0.8));
-
-        const prismGeo = new THREE.TorusKnotGeometry(1, 0.35, 100, 16);
-        const prismMat = new THREE.MeshStandardMaterial({ color: 0xaa8c2c, roughness: 0.3, metalness: 0.8 });
-        const prismMesh = new THREE.Mesh(prismGeo, prismMat);
-        cScene.add(prismMesh);
-
-        function animateContact() {
-            requestAnimationFrame(animateContact);
-            prismMesh.rotation.x += 0.01;
-            prismMesh.rotation.y += 0.01;
-            cRenderer.render(cScene, cCamera);
-        }
-        animateContact();
-
-        // Window resize handler for all 3D canvases
         window.addEventListener('resize', () => {
-            if(heroContainer) {
-                hCamera.aspect = heroContainer.clientWidth / heroContainer.clientHeight;
-                hCamera.updateProjectionMatrix();
-                hRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
-            }
-            if(aboutContainer) {
-                aCamera.aspect = aboutContainer.clientWidth / aboutContainer.clientHeight;
-                aCamera.updateProjectionMatrix();
-                aRenderer.setSize(aboutContainer.clientWidth, aboutContainer.clientHeight);
-            }
-            if(contactContainer) {
-                cCamera.aspect = contactContainer.clientWidth / contactContainer.clientHeight;
-                cCamera.updateProjectionMatrix();
-                cRenderer.setSize(contactContainer.clientWidth, contactContainer.clientHeight);
-            }
-        });
-
-        // --- PRODUCT MODAL & CART LOGIC ---
-        const productModal = document.getElementById('product-modal');
-        const closeModalTrigger = document.getElementById('close-modal-trigger');
-        const modalMainImg = document.getElementById('modal-main-img');
-        const modalThumb1 = document.getElementById('modal-thumb-1');
-        const modalThumb2 = document.getElementById('modal-thumb-2');
-        const modalBreadcrumb = document.getElementById('modal-breadcrumb');
-        const modalTitle = document.getElementById('modal-title');
-        const modalPrice = document.getElementById('modal-price');
-        const modalColorsBox = document.getElementById('modal-colors-box');
-        const modalSizesBox = document.getElementById('modal-sizes-box');
-        const modalQtyVal = document.getElementById('modal-qty-val');
-        const modalAddToBagBtn = document.getElementById('modal-add-to-bag-btn');
-
-        window.openProductModal = function(productId) {
-            const product = amoreInventory.find(p => p.id === productId);
-            if (!product) return;
-
-            currentSelectedProduct = product;
-            currentModalQty = 1;
-            selectedColorStr = product.colors[0];
-            selectedSizeStr = product.sizes[0];
-
-            modalMainImg.src = product.imgUrl;
-            modalThumb1.src = product.imgUrl;
-            modalThumb2.src = product.imgUrl;
-            modalBreadcrumb.innerText = `Home  >  ${product.segment.replace('/', '  >  ')}`;
-            modalTitle.innerText = product.name;
-            modalPrice.innerText = `${(product.price * 2.7).toFixed(2)} GEL ($${product.price.toFixed(2)})`;
-            modalQtyVal.innerText = currentModalQty;
-
-            modalColorsBox.innerHTML = product.colors.map(color => `
-                <button class="color-pill ${color === selectedColorStr ? 'selected' : ''}" onclick="selectColor('${color}', this)">${color}</button>
-            `).join('');
-
-            modalSizesBox.innerHTML = product.sizes.map(size => `
-                <button class="size-tile ${size === selectedSizeStr ? 'selected' : ''}" onclick="selectSize('${size}', this)">${size}</button>
-            `).join('');
-
-            modalAddToBagBtn.onclick = () => {
-                executeAddToBag(product, currentModalQty, selectedColorStr, selectedSizeStr);
-                productModal.classList.remove('modal-active');
-            };
-
-            productModal.classList.add('modal-active');
-        };
-
-        window.selectColor = function(color, element) {
-            document.querySelectorAll('.color-pill').forEach(btn => btn.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedColorStr = color;
-        };
-
-        window.selectSize = function(size, element) {
-            document.querySelectorAll('.size-tile').forEach(btn => btn.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedSizeStr = size;
-        };
-
-        window.adjustModalQty = function(amount) {
-            currentModalQty += amount;
-            if (currentModalQty < 1) currentModalQty = 1;
-            modalQtyVal.innerText = currentModalQty;
-        };
-
-        function executeAddToBag(product, qty, color, size) {
-            const existingIndex = reactiveBag.findIndex(item => item.id === product.id && item.color === color && item.size === size);
-            if (existingIndex > -1) {
-                reactiveBag[existingIndex].qty += qty;
+            const width = this.container.clientWidth || window.innerWidth;
+            const height = this.container.clientHeight || window.innerHeight;
+            this.camera.aspect = width / height;
+            if (this.camera.aspect < 0.85) {
+                this.baseCamPos.set(0, 17.5, 25.5);
             } else {
-                reactiveBag.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    color: color,
-                    size: size,
-                    qty: qty
-                });
+                this.baseCamPos.set(0, 13.5, 20.5);
             }
-            renderBagUpdate();
-            document.getElementById('bag-sidebar').classList.add('drawer-open');
-        }
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(width, height);
+        });
+        window.dispatchEvent(new Event('resize'));
 
-        const bagSidebarPanel = document.getElementById('bag-sidebar');
-        const bagItemsTarget = document.getElementById('bag-items-target');
-        const cartCounterNode = document.getElementById('cart-counter');
-        const subtotalValNode = document.getElementById('subtotal-val');
+        document.getElementById('btn-start').addEventListener('click', () => this.startNewGame());
+        document.getElementById('btn-play-again').addEventListener('click', () => this.startNewGame());
+        document.getElementById('btn-resume').addEventListener('click', () => this.togglePause());
+        document.getElementById('btn-pause').addEventListener('click', () => this.togglePause());
 
-        function renderBagUpdate() {
-            const totalItemsCount = reactiveBag.reduce((sum, item) => sum + item.qty, 0);
-            cartCounterNode.innerText = totalItemsCount;
+        document.getElementById('btn-restart').addEventListener('click', () => this.startNewGame());
+        document.getElementById('btn-pause-restart').addEventListener('click', () => this.startNewGame());
 
-            bagItemsTarget.innerHTML = reactiveBag.map((item, index) => `
-                <div class="bag-item-node">
-                    <div>
-                        <strong>${item.name} (${item.qty}x)</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">${item.color} / ${item.size}</p>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span>$${(item.price * item.qty).toFixed(2)}</span>
-                        <button onclick="removeBagItem(${index})" style="background:none; border:none; color:#d4af37; cursor:pointer; font-size:1.3rem;">&times;</button>
-                    </div>
-                </div>
-            `).join('');
-
-            const calculatedTotal = reactiveBag.reduce((total, item) => total + (item.price * item.qty), 0);
-            subtotalValNode.innerText = calculatedTotal.toFixed(2);
-        }
-
-        window.removeBagItem = function(index) {
-            reactiveBag.splice(index, 1);
-            renderBagUpdate();
-        };
-
-        // Event listeners
-        closeModalTrigger.addEventListener('click', () => productModal.classList.remove('modal-active'));
-        productModal.addEventListener('click', (e) => { if(e.target === productModal) productModal.classList.remove('modal-active'); });
-
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        themeToggleBtn.addEventListener('click', () => {
-            const isActiveDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (isActiveDark) {
-                document.documentElement.removeAttribute('data-theme');
-                themeToggleBtn.innerText = "🌙 Dark Reader";
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeToggleBtn.innerText = "☀️ Light Reader";
-            }
+        document.getElementById('btn-sound').addEventListener('click', () => {
+            const isMuted = this.sound.toggleMute();
+            document.getElementById('sound-icon').textContent = isMuted ? '🔇' : '🔊';
         });
 
-        document.getElementById('cart-toggle').addEventListener('click', () => bagSidebarPanel.classList.add('drawer-open'));
-        document.getElementById('close-bag').addEventListener('click', () => bagSidebarPanel.classList.remove('drawer-open'));
-
-        document.getElementById('checkout-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (reactiveBag.length === 0) {
-                alert("Your shopping bag is empty!");
-                return;
-            }
-            alert("✨ Order Secured at Città dell’amore via Premium Checkout Architecture. Thank you!");
-            reactiveBag = [];
-            renderBagUpdate();
-            bagSidebarPanel.classList.remove('drawer-open');
-            e.target.reset();
+        const diffButtons = document.querySelectorAll('.diff-btn');
+        diffButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                diffButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.difficulty = btn.getAttribute('data-diff');
+            });
         });
+    }
+}
 
-        document.getElementById('contact-inquiry-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert("✨ Thank you for contacting Città dell’amore Concierge. We will respond shortly!");
-            e.target.reset();
-        });
-
-        // Initialize Catalog
-        initializeCatalogDisplay();
-    </script>
+window.onload = function () {
+    const game = new Pong3DGame();
+    game.animate();
+};
+</script>
 </body>
 </html>
