@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Città dell’amore | Sun, Moon & Stars</title>
+    <link rel="icon" href="/images/Logo.png" type="images/icon type"> 
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Three.js for 3D Celestial Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #f8f9fd;
+            --bg-card: #ffffff;
+            --text-primary: #111111;
+            --text-muted: #707072;
+            --gold-accent: #d4af37;
+            --gold-deep: #aa8c2c;
+            --border-line: #e5e5e5;
+            --panel-shadow: rgba(0, 0, 0, 0.05);
+            --nike-easing: cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-speed: 0.5s;
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0b0b0e;
+            --bg-card: #141418;
+            --text-primary: #ffffff;
+            --text-muted: #9e9e9e;
+            --border-line: #2d2d30;
+            --panel-shadow: rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            transition: background-color var(--transition-speed) var(--nike-easing), color var(--transition-speed) var(--nike-easing);
+            overflow-x: hidden;
+        }
+
+        /* --- 10-SECOND CINEMATIC LOADING SCREEN --- */
+        #loader-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #050508;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), visibility 1s;
+        }
+
+        #loader-canvas-container {
+            width: 280px;
+            height: 280px;
+            position: relative;
+        }
+
+        .loader-brand {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            margin-top: 25px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .loader-progress-bar-wrap {
+            width: 220px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loader-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #ffd700);
+            transition: width 0.1s linear;
+        }
+
+        .loader-percentage {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* --- NAVIGATION --- */
+        .luxury-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-line);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color var(--transition-speed) var(--nike-easing);
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 35px;
+        }
+
+        .menu-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .menu-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--gold-accent);
+            transition: width 0.3s var(--nike-easing);
+        }
+
+        .menu-link:hover::after,
+        .menu-link.active::after {
+            width: 100%;
+        }
+
+        .nav-utilities {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-btn-primary {
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            border: 1px solid var(--text-primary);
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s var(--nike-easing);
+        }
+
+        .nav-btn-primary:hover {
+            background-color: var(--gold-accent);
+            border-color: var(--gold-accent);
+            color: white;
+        }
+
+        .nav-btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-line);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            font-weight: 500;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s var(--nike-easing);
+        }
+
+        .nav-btn-secondary:hover {
+            background-color: var(--bg-main);
+        }
+
+        /* --- HERO SECTION WITH 3D CANVAS --- */
+        .nike-style-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: calc(90vh - 75px);
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-line);
+        }
+
+        .hero-text-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 10%;
+        }
+
+        .hero-series-tag {
+            color: var(--gold-accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .hero-display-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 1.05;
+            font-weight: 800;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .hero-lead-text {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        .hero-action-cta {
+            display: inline-block;
+            align-self: flex-start;
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            text-decoration: none;
+            padding: 16px 36px;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s var(--nike-easing);
+        }
+
+        .hero-action-cta:hover {
+            background-color: var(--gold-accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .hero-graphic-side {
+            position: relative;
+            background-color: var(--bg-main);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #hero-three-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            outline: none;
+        }
+
+        /* --- STOREFRONT & CATALOG --- */
+        .storefront-body {
+            padding: 80px 5%;
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .catalog-header h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        .category-filter-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid var(--border-line);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-pill.active, .filter-pill:hover {
+            background-color: var(--gold-accent);
+            border-color: var(--gold-accent);
+            color: #fff;
+        }
+
+        .nike-product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .nike-product-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-line);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s var(--nike-easing), box-shadow 0.4s var(--nike-easing);
+            border-radius: 8px;
+        }
+
+        .nike-product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px var(--panel-shadow);
+        }
+
+        .card-media-box {
+            width: 100%;
+            height: 380px;
+            background-color: var(--bg-main);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s var(--nike-easing);
+        }
+
+        .nike-product-card:hover .card-img {
+            transform: scale(1.06);
+        }
+
+        .card-meta-info {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-meta-info h3 {
+            font-size: 1.15rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        .card-item-tag {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .card-interaction-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .card-price-lbl {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--gold-accent);
+        }
+
+        /* --- ABOUT US SECTION (3D CRYSTAL) --- */
+        .about-section {
+            padding: 100px 5%;
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-line);
+            border-bottom: 1px solid var(--border-line);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.8rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .about-content p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .about-canvas-box {
+            width: 100%;
+            height: 450px;
+            position: relative;
+            background: var(--bg-main);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px var(--panel-shadow);
+        }
+
+        #about-three-canvas {
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+
+        /* --- CONTACT & CONCIERGE SECTION --- */
+        .contact-section {
+            padding: 100px 5%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .contact-form-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-line);
+            padding: 45px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px var(--panel-shadow);
+        }
+
+        .contact-form-box h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .contact-form-box p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .contact-input-group {
+            margin-bottom: 20px;
+        }
+
+        .contact-input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-input {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-line);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            border-radius: 6px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .contact-input:focus {
+            border-color: var(--gold-accent);
+        }
+
+        textarea.contact-input {
+            resize: vertical;
+            height: 130px;
+        }
+
+        .contact-submit-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s var(--nike-easing);
+        }
+
+        .contact-submit-btn:hover {
+            background-color: var(--gold-accent);
+            color: #fff;
+        }
+
+        .contact-canvas-box {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px var(--panel-shadow);
+        }
+
+        #contact-three-canvas {
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+
+        /* --- SHOPPING BAG SIDEBAR --- */
+        .bag-drawer {
+            position: fixed;
+            top: 0;
+            right: -460px;
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            background-color: var(--bg-card);
+            box-shadow: -10px 0 40px var(--panel-shadow);
+            z-index: 200;
+            transition: right 0.4s var(--nike-easing);
+        }
+
+        .bag-drawer.drawer-open {
+            right: 0;
+        }
+
+        .drawer-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 35px;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-line);
+            padding-bottom: 20px;
+        }
+
+        .drawer-header h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+        }
+
+        .close-drawer-x {
+            background: transparent;
+            border: none;
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .drawer-items-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .bag-item-node {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-line);
+        }
+
+        .drawer-checkout-footer {
+            border-top: 1px solid var(--border-line);
+            padding-top: 25px;
+        }
+
+        .subtotal-display {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .secure-checkout-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .secure-checkout-panel h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .luxury-input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-line);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .luxury-input:focus {
+            border-color: var(--gold-accent);
+        }
+
+        .input-split-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .submit-checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s var(--nike-easing);
+        }
+
+        .submit-checkout-btn:hover {
+            background-color: var(--gold-accent);
+            color: white;
+        }
+
+        /* --- PRODUCT VIEWER MODAL --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s var(--nike-easing);
+        }
+
+        .modal-backdrop.modal-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .product-viewer-container {
+            background-color: var(--bg-card);
+            width: 92%;
+            max-width: 1100px;
+            max-height: 85vh;
+            border-radius: 12px;
+            position: relative;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 2.2rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            z-index: 10;
+        }
+
+        .modal-split-layout {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 35px;
+        }
+
+        .main-display-frame {
+            width: 100%;
+            height: 420px;
+            background-color: var(--bg-main);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .main-display-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-gallery-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .thumb-node {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .thumb-node.active, .thumb-node:hover {
+            border-color: var(--text-primary);
+        }
+
+        .breadcrumb-trail {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .product-main-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .product-price-tag {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--gold-accent);
+        }
+
+        .modal-divider-line {
+            border: 0;
+            height: 1px;
+            background-color: var(--border-line);
+            margin-bottom: 15px;
+        }
+
+        .attribute-selection-group {
+            margin-bottom: 15px;
+        }
+
+        .attribute-label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .color-options-flex {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-pill {
+            padding: 6px 14px;
+            border: 1px solid var(--border-line);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .color-pill.selected {
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            border-color: var(--text-primary);
+        }
+
+        .size-options-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .size-tile {
+            padding: 8px 0;
+            text-align: center;
+            border: 1px solid var(--border-line);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .size-tile.selected {
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            border-color: var(--text-primary);
+        }
+
+        .quantity-picker-row {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-line);
+            width: 110px;
+            border-radius: 4px;
+        }
+
+        .qty-math-btn {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .qty-current-val {
+            flex-grow: 1;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .modal-primary-buy-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--text-primary);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-primary-buy-btn:hover {
+            background-color: var(--gold-accent);
+            color: #fff;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 960px) {
+            .nike-style-hero, .about-section, .contact-section {
+                grid-template-columns: 1fr;
+            }
+            .hero-text-side {
+                padding: 60px 5%;
+                order: 2;
+            }
+            .hero-graphic-side {
+                height: 400px;
+                order: 1;
+            }
+            .nav-menu {
+                display: none; 
+            }
+            .modal-split-layout {
+                grid-template-columns: 1fr;
+            }
+            .product-viewer-container {
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 10-SECOND CINEMATIC LOADING SCREEN -->
+    <div id="loader-screen">
+        <div id="loader-canvas-container"></div>
+        <div class="loader-brand">Città dell’amore</div>
+        <div class="loader-progress-bar-wrap">
+            <div class="loader-progress-fill" id="loader-fill"></div>
+        </div>
+        <div class="loader-percentage" id="loader-pct">0%</div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="luxury-nav">
+        <div class="logo">Città dell’amore</div>
+        <ul class="nav-menu">
+            <li><a href="#collection" class="menu-link active">Collection</a></li>
+            <li><a href="#about" class="menu-link">About Us</a></li>
+            <li><a href="#contact" class="menu-link">Contact</a></li>
+            <li><a href="#collection" class="menu-link">Matching Apparel</a></li>
+        </ul>
+        <div class="nav-utilities">
+            <button id="theme-toggle" class="nav-btn-secondary">🌙 Dark Reader</button>
+            <button id="cart-toggle" class="nav-btn-primary">Bag (<span id="cart-counter">0</span>)</button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION WITH 3D SUN & MOON CANVAS -->
+    <header class="nike-style-hero">
+        <div class="hero-text-side">
+            <span class="hero-series-tag">SUN_NIGHT_AND_STARS • Official Shop</span>
+            <h1 class="hero-display-title">WELCOME TO THE SUN & MOON</h1>
+            <p class="hero-lead-text">Discover our exclusive celestial collection of couples bracelets, necklaces, luxury hoodies, and cosmic apparel crafted for eternity.</p>
+            <a href="#collection" class="hero-action-cta">Shop the Capsule</a>
+        </div>
+        <div class="hero-graphic-side">
+            <canvas id="hero-three-canvas"></canvas>
+        </div>
+    </header>
+
+    <!-- STOREFRONT CATALOG -->
+    <main class="storefront-body" id="collection">
+        <div class="catalog-header">
+            <h2>Trending Essentials</h2>
+            <div class="category-filter-pills">
+                <button class="filter-pill active" onclick="filterCatalog('all', this)">All Pieces</button>
+                <button class="filter-pill" onclick="filterCatalog('Jewelry', this)">Fine Jewelry</button>
+                <button class="filter-pill" onclick="filterCatalog('Apparel', this)">Matching Apparel</button>
+                <button class="filter-pill" onclick="filterCatalog('Accessories', this)">Accessories</button>
+            </div>
+        </div>
+        
+        <div class="nike-product-grid" id="products-root"></div>
+    </main>
+
+    <!-- ABOUT US SECTION WITH 3D CRYSTAL CANVAS -->
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>The Myth of Sun & Moon</h2>
+            <p>Born from the eternal dance between celestial light and midnight shadow, Città dell’amore represents the unbreakable bond between two souls destined across the cosmos.</p>
+            <p>Every piece in our boutique is meticulously engineered with refined golden accents, durable fabrics, and astronomical inspiration, making your love story timeless.</p>
+        </div>
+        <div class="about-canvas-box">
+            <canvas id="about-three-canvas"></canvas>
+        </div>
+    </section>
+
+    <!-- CONTACT & CONCIERGE SECTION WITH 3D ENVELOPE CANVAS -->
+    <section class="contact-section" id="contact">
+        <div class="contact-form-box">
+            <h2>Concierge & Inquiries</h2>
+            <p>Have a custom request or need assistance with your order? Our celestial concierge is at your service.</p>
+            <form id="contact-inquiry-form">
+                <div class="contact-input-group">
+                    <label>Your Name</label>
+                    <input type="text" class="contact-input" placeholder="e.g. Elena Rostova" required>
+                </div>
+                <div class="contact-input-group">
+                    <label>Email Address</label>
+                    <input type="email" class="contact-input" placeholder="elena@example.com" required>
+                </div>
+                <div class="contact-input-group">
+                    <label>Message</label>
+                    <textarea class="contact-input" placeholder="How can we assist your journey?" required></textarea>
+                </div>
+                <button type="submit" class="contact-submit-btn">Send Message</button>
+            </form>
+        </div>
+        <div class="contact-canvas-box">
+            <canvas id="contact-three-canvas"></canvas>
+        </div>
+    </section>
+
+    <!-- PRODUCT VIEWER MODAL -->
+    <div class="modal-backdrop" id="product-modal">
+        <div class="product-viewer-container">
+            <button class="close-modal-btn" id="close-modal-trigger">&times;</button>
+            
+            <div class="modal-split-layout">
+                <div class="viewer-media-side">
+                    <div class="main-display-frame">
+                        <img id="modal-main-img" src="" alt="Showcase View">
+                    </div>
+                    <div class="thumbnail-gallery-row">
+                        <img id="modal-thumb-1" class="thumb-node active" src="" alt="Preview 1">
+                        <img id="modal-thumb-2" class="thumb-node" src="" alt="Preview 2">
+                    </div>
+                </div>
+
+                <div class="viewer-details-side">
+                    <nav class="breadcrumb-trail" id="modal-breadcrumb">Home > Shop</nav>
+                    <h1 class="product-main-title" id="modal-title">Product Name</h1>
+                    <div class="product-price-tag" id="modal-price">0.00 GEL</div>
+
+                    <hr class="modal-divider-line">
+
+                    <div class="attribute-selection-group">
+                        <label class="attribute-label">ფერი / Color:</label>
+                        <div class="color-options-flex" id="modal-colors-box"></div>
+                    </div>
+
+                    <div class="attribute-selection-group">
+                        <label class="attribute-label">ზომა / Size:</label>
+                        <div class="size-options-grid" id="modal-sizes-box"></div>
+                    </div>
+
+                    <div class="attribute-selection-group">
+                        <label class="attribute-label">რაოდენობა / Quantity:</label>
+                        <div class="quantity-picker-row">
+                            <button class="qty-math-btn" onclick="adjustModalQty(-1)">-</button>
+                            <span class="qty-current-val" id="modal-qty-val">1</span>
+                            <button class="qty-math-btn" onclick="adjustModalQty(1)">+</button>
+                        </div>
+                    </div>
+                    <button class="modal-primary-buy-btn" id="modal-add-to-bag-btn">Add To Bag</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOPPING BAG SIDEBAR -->
+    <aside class="bag-drawer" id="bag-sidebar">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3>Shopping Bag</h3>
+                <button id="close-bag" class="close-drawer-x">&times;</button>
+            </div>
+            
+            <div class="drawer-items-list" id="bag-items-target"></div>
+            
+            <div class="drawer-checkout-footer">
+                <div class="subtotal-display">
+                    <span>Subtotal</span>
+                    <span>$<span id="subtotal-val">0.00</span></span>
+                </div>
+                
+                <form id="checkout-form" class="secure-checkout-panel">
+                    <h4>Secure Checkout</h4>
+                    <input type="text" placeholder="Cardholder Name" required class="luxury-input">
+                    <input type="text" placeholder="Card Number" maxlength="16" required class="luxury-input">
+                    <div class="input-split-row">
+                        <input type="text" placeholder="MM/YY" maxlength="5" required class="luxury-input">
+                        <input type="text" placeholder="CVV" maxlength="3" required class="luxury-input">
+                    </div>
+                    <button type="submit" class="submit-checkout-btn">Complete Transaction</button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // --- 10-SECOND CINEMATIC LOADER ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const loaderFill = document.getElementById('loader-fill');
+            const loaderPct = document.getElementById('loader-pct');
+            const loaderScreen = document.getElementById('loader-screen');
+
+            // Three.js loader canvas (Eclipse animation)
+            const loaderContainer = document.getElementById('loader-canvas-container');
+            const lScene = new THREE.Scene();
+            const lCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+            lCamera.position.z = 5;
+            const lRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            lRenderer.setSize(loaderContainer.clientWidth, loaderContainer.clientHeight);
+            loaderContainer.appendChild(lRenderer.domElement);
+
+            const lSunGeo = new THREE.SphereGeometry(1, 32, 32);
+            const lSunMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+            const lSun = new THREE.Mesh(lSunGeo, lSunMat);
+            lScene.add(lSun);
+
+            const lMoonGeo = new THREE.SphereGeometry(0.95, 32, 32);
+            const lMoonMat = new THREE.MeshBasicMaterial({ color: 0x050508 });
+            const lMoon = new THREE.Mesh(lMoonGeo, lMoonMat);
+            lMoon.position.set(-2.5, 0, 0.5);
+            lScene.add(lMoon);
+
+            let lAnimId;
+            function animateLoaderScene() {
+                lAnimId = requestAnimationFrame(animateLoaderScene);
+                lMoon.position.x += 0.015;
+                if (lMoon.position.x > 2.5) lMoon.position.x = -2.5;
+                lRenderer.render(lScene, lCamera);
+            }
+            animateLoaderScene();
+
+            let currentPct = 0;
+            // 10 seconds total loading time (10,000ms / 100 intervals = 100ms)
+            const intervalTime = 100; 
+            const increment = 1;
+
+            const loadTimer = setInterval(() => {
+                currentPct += increment;
+                if (currentPct > 100) currentPct = 100;
+                loaderFill.style.width = currentPct + '%';
+                loaderPct.innerText = currentPct + '%';
+
+                if (currentPct === 100) {
+                    clearInterval(loadTimer);
+                    cancelAnimationFrame(lAnimId);
+                    setTimeout(() => {
+                        loaderScreen.style.opacity = '0';
+                        setTimeout(() => loaderScreen.style.display = 'none', 1000);
+                    }, 500);
+                }
+            }, 100);
+        });
+
+        // --- INVENTORY DATA ---
+        const amoreInventory = [
+            {
+                id: 201,
+                name: "Eternity Sun Pendant",
+                segment: "Fine Jewelry / Necklaces",
+                category: "Jewelry",
+                price: 145.00,
+                imgUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80",
+                colors: ["Gold", "Silver"],
+                sizes: ["One Size"]
+            },
+            {
+                id: 202,
+                name: "Midnight Moon Bracelet",
+                segment: "Fine Jewelry / Bracelets",
+                category: "Jewelry",
+                price: 95.00,
+                imgUrl: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80",
+                colors: ["Midnight Black", "Rose Gold"],
+                sizes: ["Adjustable"]
+            },
+            {
+                id: 203,
+                name: "Città Promise Ring Set",
+                segment: "Studio Luxury / Rings",
+                category: "Jewelry",
+                price: 210.00,
+                imgUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80",
+                colors: ["Silver", "Gold"],
+                sizes: ["5", "6", "7", "8", "9"]
+            },
+            {
+                id: 204,
+                name: "Oversized 'Amore' Heavy Hoodie",
+                segment: "Apparel / Matching Hoodies",
+                category: "Apparel",
+                price: 85.00,
+                imgUrl: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80",
+                colors: ["Black", "Desert Sand", "Cream White"],
+                sizes: ["S", "M", "L", "XL", "2XL"]
+            },
+            {
+                id: 205,
+                name: "Cosmic Alignment Sweatshirt",
+                segment: "Apparel / Sweatshirts",
+                category: "Apparel",
+                price: 70.00,
+                imgUrl: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=600&q=80",
+                colors: ["Navy Blue", "Charcoal Gray", "White"],
+                sizes: ["S", "M", "L", "XL"]
+            },
+            {
+                id: 206,
+                name: "Constellation Shield Case",
+                segment: "Accessories / Phone Cases",
+                category: "Accessories",
+                price: 40.00,
+                imgUrl: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=600&q=80",
+                colors: ["Clear Cosmic", "Matte Black"],
+                sizes: ["iPhone 13", "iPhone 14", "iPhone 15", "iPhone 15 Pro"]
+            }
+        ];
+
+        let reactiveBag = [];
+        let currentSelectedProduct = null;
+        let currentModalQty = 1;
+        let selectedColorStr = "";
+        let selectedSizeStr = "";
+
+        // --- RENDER CATALOG ---
+        const productsGridRoot = document.getElementById('products-root');
+
+        function initializeCatalogDisplay(filter = 'all') {
+            const filtered = filter === 'all' ? amoreInventory : amoreInventory.filter(i => i.category === filter);
+            productsGridRoot.innerHTML = filtered.map(item => `
+                <article class="nike-product-card">
+                    <div class="card-media-box" onclick="openProductModal(${item.id})">
+                        <img src="${item.imgUrl}" alt="${item.name}" class="card-img" loading="lazy">
+                    </div>
+                    <div class="card-meta-info">
+                        <div onclick="openProductModal(${item.id})">
+                            <h3>${item.name}</h3>
+                            <p class="card-item-tag">${item.segment}</p>
+                        </div>
+                        <div class="card-interaction-row">
+                            <span class="card-price-lbl">$${item.price.toFixed(2)}</span>
+                            <button class="nav-btn-primary" onclick="openProductModal(${item.id})">View Details</button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        window.filterCatalog = function(category, btnElement) {
+            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            initializeCatalogDisplay(category);
+        };
+
+        // --- THREE.JS 1: HERO SUN & MOON ---
+        const heroContainer = document.querySelector('.hero-graphic-side');
+        const hScene = new THREE.Scene();
+        const hCamera = new THREE.PerspectiveCamera(60, heroContainer.clientWidth / heroContainer.clientHeight, 0.1, 1000);
+        hCamera.position.z = 6;
+        const hRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-three-canvas'), alpha: true, antialias: true });
+        hRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
+
+        const hAmbient = new THREE.AmbientLight(0xffffff, 1);
+        hScene.add(hAmbient);
+        const hPointLight = new THREE.PointLight(0xffd700, 2, 50);
+        hPointLight.position.set(5, 5, 5);
+        hScene.add(hPointLight);
+
+        // Sun Mesh
+        const sunGeo = new THREE.SphereGeometry(1.2, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xaa8c2c, roughness: 0.3 });
+        const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+        sunMesh.position.set(-1.2, 0, 0);
+        hScene.add(sunMesh);
+
+        // Moon Mesh
+        const moonGeo = new THREE.SphereGeometry(1.0, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.8 });
+        const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+        moonMesh.position.set(1.2, 0, 0);
+        hScene.add(moonMesh);
+
+        // Orbital Ring
+        const ringGeo = new THREE.RingGeometry(2.2, 2.25, 64);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4af37, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 3;
+        hScene.add(ringMesh);
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) - 0.5;
+            mouseY = (e.clientY / window.innerHeight) - 0.5;
+        });
+
+        function animateHero() {
+            requestAnimationFrame(animateHero);
+            sunMesh.rotation.y += 0.005;
+            moonMesh.rotation.y -= 0.005;
+            ringMesh.rotation.z += 0.002;
+
+            hCamera.position.x += (mouseX * 1.5 - hCamera.position.x) * 0.05;
+            hCamera.position.y += (-mouseY * 1.5 - hCamera.position.y) * 0.05;
+            hCamera.lookAt(hScene.position);
+
+            hRenderer.render(hScene, hCamera);
+        }
+        animateHero();
+
+        // --- THREE.JS 2: ABOUT US GOLDEN CRYSTAL ---
+        const aboutContainer = document.querySelector('.about-canvas-box');
+        const aScene = new THREE.Scene();
+        const aCamera = new THREE.PerspectiveCamera(60, aboutContainer.clientWidth / aboutContainer.clientHeight, 0.1, 1000);
+        aCamera.position.z = 4.5;
+        const aRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('about-three-canvas'), alpha: true, antialias: true });
+        aRenderer.setSize(aboutContainer.clientWidth, aboutContainer.clientHeight);
+
+        const aLight = new THREE.DirectionalLight(0xffd700, 2);
+        aLight.position.set(2, 4, 3);
+        aScene.add(aLight);
+        aScene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+        const crystalGeo = new THREE.IcosahedronGeometry(1.5, 0);
+        const crystalMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.2, metalness: 0.9, wireframe: false });
+        const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
+        aScene.add(crystalMesh);
+
+        function animateAbout() {
+            requestAnimationFrame(animateAbout);
+            crystalMesh.rotation.x += 0.008;
+            crystalMesh.rotation.y += 0.012;
+            aRenderer.render(aScene, aCamera);
+        }
+        animateAbout();
+
+        // --- THREE.JS 3: CONTACT FLOATING PRISM ---
+        const contactContainer = document.querySelector('.contact-canvas-box');
+        const cScene = new THREE.Scene();
+        const cCamera = new THREE.PerspectiveCamera(60, contactContainer.clientWidth / contactContainer.clientHeight, 0.1, 1000);
+        cCamera.position.z = 4.5;
+        const cRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('contact-three-canvas'), alpha: true, antialias: true });
+        cRenderer.setSize(contactContainer.clientWidth, contactContainer.clientHeight);
+
+        const cLight = new THREE.PointLight(0xffd700, 3, 50);
+        cLight.position.set(3, 3, 3);
+        cScene.add(cLight);
+        cScene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+        const prismGeo = new THREE.TorusKnotGeometry(1, 0.35, 100, 16);
+        const prismMat = new THREE.MeshStandardMaterial({ color: 0xaa8c2c, roughness: 0.3, metalness: 0.8 });
+        const prismMesh = new THREE.Mesh(prismGeo, prismMat);
+        cScene.add(prismMesh);
+
+        function animateContact() {
+            requestAnimationFrame(animateContact);
+            prismMesh.rotation.x += 0.01;
+            prismMesh.rotation.y += 0.01;
+            cRenderer.render(cScene, cCamera);
+        }
+        animateContact();
+
+        // Window resize handler for all 3D canvases
+        window.addEventListener('resize', () => {
+            if(heroContainer) {
+                hCamera.aspect = heroContainer.clientWidth / heroContainer.clientHeight;
+                hCamera.updateProjectionMatrix();
+                hRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
+            }
+            if(aboutContainer) {
+                aCamera.aspect = aboutContainer.clientWidth / aboutContainer.clientHeight;
+                aCamera.updateProjectionMatrix();
+                aRenderer.setSize(aboutContainer.clientWidth, aboutContainer.clientHeight);
+            }
+            if(contactContainer) {
+                cCamera.aspect = contactContainer.clientWidth / contactContainer.clientHeight;
+                cCamera.updateProjectionMatrix();
+                cRenderer.setSize(contactContainer.clientWidth, contactContainer.clientHeight);
+            }
+        });
+
+        // --- PRODUCT MODAL & CART LOGIC ---
+        const productModal = document.getElementById('product-modal');
+        const closeModalTrigger = document.getElementById('close-modal-trigger');
+        const modalMainImg = document.getElementById('modal-main-img');
+        const modalThumb1 = document.getElementById('modal-thumb-1');
+        const modalThumb2 = document.getElementById('modal-thumb-2');
+        const modalBreadcrumb = document.getElementById('modal-breadcrumb');
+        const modalTitle = document.getElementById('modal-title');
+        const modalPrice = document.getElementById('modal-price');
+        const modalColorsBox = document.getElementById('modal-colors-box');
+        const modalSizesBox = document.getElementById('modal-sizes-box');
+        const modalQtyVal = document.getElementById('modal-qty-val');
+        const modalAddToBagBtn = document.getElementById('modal-add-to-bag-btn');
+
+        window.openProductModal = function(productId) {
+            const product = amoreInventory.find(p => p.id === productId);
+            if (!product) return;
+
+            currentSelectedProduct = product;
+            currentModalQty = 1;
+            selectedColorStr = product.colors[0];
+            selectedSizeStr = product.sizes[0];
+
+            modalMainImg.src = product.imgUrl;
+            modalThumb1.src = product.imgUrl;
+            modalThumb2.src = product.imgUrl;
+            modalBreadcrumb.innerText = `Home  >  ${product.segment.replace('/', '  >  ')}`;
+            modalTitle.innerText = product.name;
+            modalPrice.innerText = `${(product.price * 2.7).toFixed(2)} GEL ($${product.price.toFixed(2)})`;
+            modalQtyVal.innerText = currentModalQty;
+
+            modalColorsBox.innerHTML = product.colors.map(color => `
+                <button class="color-pill ${color === selectedColorStr ? 'selected' : ''}" onclick="selectColor('${color}', this)">${color}</button>
+            `).join('');
+
+            modalSizesBox.innerHTML = product.sizes.map(size => `
+                <button class="size-tile ${size === selectedSizeStr ? 'selected' : ''}" onclick="selectSize('${size}', this)">${size}</button>
+            `).join('');
+
+            modalAddToBagBtn.onclick = () => {
+                executeAddToBag(product, currentModalQty, selectedColorStr, selectedSizeStr);
+                productModal.classList.remove('modal-active');
+            };
+
+            productModal.classList.add('modal-active');
+        };
+
+        window.selectColor = function(color, element) {
+            document.querySelectorAll('.color-pill').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedColorStr = color;
+        };
+
+        window.selectSize = function(size, element) {
+            document.querySelectorAll('.size-tile').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedSizeStr = size;
+        };
+
+        window.adjustModalQty = function(amount) {
+            currentModalQty += amount;
+            if (currentModalQty < 1) currentModalQty = 1;
+            modalQtyVal.innerText = currentModalQty;
+        };
+
+        function executeAddToBag(product, qty, color, size) {
+            const existingIndex = reactiveBag.findIndex(item => item.id === product.id && item.color === color && item.size === size);
+            if (existingIndex > -1) {
+                reactiveBag[existingIndex].qty += qty;
+            } else {
+                reactiveBag.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    color: color,
+                    size: size,
+                    qty: qty
+                });
+            }
+            renderBagUpdate();
+            document.getElementById('bag-sidebar').classList.add('drawer-open');
+        }
+
+        const bagSidebarPanel = document.getElementById('bag-sidebar');
+        const bagItemsTarget = document.getElementById('bag-items-target');
+        const cartCounterNode = document.getElementById('cart-counter');
+        const subtotalValNode = document.getElementById('subtotal-val');
+
+        function renderBagUpdate() {
+            const totalItemsCount = reactiveBag.reduce((sum, item) => sum + item.qty, 0);
+            cartCounterNode.innerText = totalItemsCount;
+
+            bagItemsTarget.innerHTML = reactiveBag.map((item, index) => `
+                <div class="bag-item-node">
+                    <div>
+                        <strong>${item.name} (${item.qty}x)</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">${item.color} / ${item.size}</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span>$${(item.price * item.qty).toFixed(2)}</span>
+                        <button onclick="removeBagItem(${index})" style="background:none; border:none; color:#d4af37; cursor:pointer; font-size:1.3rem;">&times;</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const calculatedTotal = reactiveBag.reduce((total, item) => total + (item.price * item.qty), 0);
+            subtotalValNode.innerText = calculatedTotal.toFixed(2);
+        }
+
+        window.removeBagItem = function(index) {
+            reactiveBag.splice(index, 1);
+            renderBagUpdate();
+        };
+
+        // Event listeners
+        closeModalTrigger.addEventListener('click', () => productModal.classList.remove('modal-active'));
+        productModal.addEventListener('click', (e) => { if(e.target === productModal) productModal.classList.remove('modal-active'); });
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        themeToggleBtn.addEventListener('click', () => {
+            const isActiveDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isActiveDark) {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggleBtn.innerText = "🌙 Dark Reader";
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggleBtn.innerText = "☀️ Light Reader";
+            }
+        });
+
+        document.getElementById('cart-toggle').addEventListener('click', () => bagSidebarPanel.classList.add('drawer-open'));
+        document.getElementById('close-bag').addEventListener('click', () => bagSidebarPanel.classList.remove('drawer-open'));
+
+        document.getElementById('checkout-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (reactiveBag.length === 0) {
+                alert("Your shopping bag is empty!");
+                return;
+            }
+            alert("✨ Order Secured at Città dell’amore via Premium Checkout Architecture. Thank you!");
+            reactiveBag = [];
+            renderBagUpdate();
+            bagSidebarPanel.classList.remove('drawer-open');
+            e.target.reset();
+        });
+
+        document.getElementById('contact-inquiry-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert("✨ Thank you for contacting Città dell’amore Concierge. We will respond shortly!");
+            e.target.reset();
+        });
+
+        // Initialize Catalog
+        initializeCatalogDisplay();
+    </script>
+</body>
+</html>
