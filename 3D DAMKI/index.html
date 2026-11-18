@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Neon Damki</title>
+    <!-- Tailwind CSS for sleek UI overlay -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#060811',
+                        cardBg: '#0d1323',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #060811;
+            color: #f8fafc;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .interactive {
+            pointer-events: auto;
+        }
+        /* Neon glow effects */
+        .neon-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 8px rgba(6, 182, 212, 0.2);
+        }
+        .neon-magenta {
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4), inset 0 0 8px rgba(236, 72, 153, 0.2);
+        }
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 4s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-slate-100 h-screen flex flex-col justify-between">
+
+    <!-- Cyberpunk Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-[100] bg-darkBg flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+        <div class="relative w-24 h-24 mb-6 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full border-4 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
+            <div class="absolute inset-2 rounded-full border-4 border-fuchsia-500/20 border-b-fuchsia-500 animate-spin-slow"></div>
+            <i class="fa-solid fa-chess-board text-3xl text-white"></i>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-cyan-300 via-indigo-300 to-fuchsia-400 bg-clip-text text-transparent mb-2 tracking-tight">
+            3D NEON DAMKI
+        </h1>
+        <p class="text-xs font-extrabold uppercase tracking-[0.25em] text-cyan-300 mb-3">Created by VARADA</p>
+        <p id="loading-status" class="text-xs text-slate-400 uppercase tracking-widest mb-6">Initializing Cyber Arena...</p>
+        <div class="w-64 h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+            <div id="loading-bar" class="h-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 rounded-full transition-all duration-200" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <!-- Setup / Color & Difficulty Menu Modal -->
+    <div id="setup-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden interactive p-4">
+        <div class="bg-cardBg border border-slate-700/80 max-w-lg w-full p-6 md:p-7 rounded-3xl shadow-2xl relative">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-tr from-cyan-500 to-fuchsia-600 p-2.5 rounded-xl shadow-lg">
+                        <i class="fa-solid fa-sliders text-lg text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Arena Setup</h2>
+                        <p class="text-xs text-slate-400">Customize your pieces, mode & difficulty</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="flex items-center space-x-1.5 bg-orange-950/60 border border-orange-500/40 px-2.5 py-1.5 rounded-xl" title="Win 3 games in a row for +3,000 bonus coins!">
+                        <span class="text-xs">🔥</span>
+                        <span id="menu-streak" class="font-mono font-bold text-xs text-orange-300">STREAK: 0/3</span>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-amber-950/50 border border-amber-500/40 px-3 py-1.5 rounded-xl">
+                        <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
+                        <span id="menu-coins" class="font-mono font-bold text-sm text-amber-300">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Name & Number Entry -->
+            <div class="mb-4">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">1. Player Name & Number</label>
+                <div class="grid grid-cols-3 gap-2.5">
+                    <div class="col-span-2">
+                        <input id="input-p1-name" type="text" maxlength="14" placeholder="Player 1 Name" value="Player 1" class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 focus:outline-none text-xs font-semibold text-white placeholder-slate-500">
+                    </div>
+                    <div>
+                        <input id="input-p1-num" type="text" maxlength="4" placeholder="#01" value="01" class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 focus:outline-none text-xs font-mono font-bold text-cyan-300 text-center placeholder-slate-500">
+                    </div>
+                </div>
+                <div id="p2-identity-row" class="hidden grid grid-cols-3 gap-2.5 mt-2">
+                    <div class="col-span-2">
+                        <input id="input-p2-name" type="text" maxlength="14" placeholder="Player 2 Name" value="Player 2" class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-fuchsia-400 focus:outline-none text-xs font-semibold text-white placeholder-slate-500">
+                    </div>
+                    <div>
+                        <input id="input-p2-num" type="text" maxlength="4" placeholder="#02" value="02" class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-fuchsia-400 focus:outline-none text-xs font-mono font-bold text-fuchsia-300 text-center placeholder-slate-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Mode Selection -->
+            <div class="mb-4">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">2. Select Game Mode</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="select-mode-ai" class="py-2.5 px-4 rounded-xl border-2 border-cyan-500 bg-cyan-950/40 text-white font-bold text-sm flex items-center justify-center space-x-2 transition-all">
+                        <i class="fa-solid fa-robot text-cyan-400"></i>
+                        <span>1P vs AI</span>
+                    </button>
+                    <button id="select-mode-2p" class="py-2.5 px-4 rounded-xl border-2 border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white font-bold text-sm flex items-center justify-center space-x-2 transition-all">
+                        <i class="fa-solid fa-user-group text-fuchsia-400"></i>
+                        <span>2 Players (Local)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Difficulty Selection (Hidden in 2P Mode) -->
+            <div id="ai-difficulty-section" class="mb-4">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">3. AI Difficulty & Win Reward</label>
+                <div class="grid grid-cols-3 gap-2.5">
+                    <button data-diff="easy" class="diff-btn py-2.5 px-3 rounded-xl border-2 border-emerald-500 bg-emerald-950/40 text-white flex flex-col items-center transition-all">
+                        <span class="text-xs font-extrabold text-emerald-300">EASY</span>
+                        <span class="text-[10px] text-slate-300 mt-0.5">Casual Win</span>
+                        <span class="text-[10px] font-mono text-amber-400 mt-1"><i class="fa-solid fa-coins mr-1"></i>+200</span>
+                    </button>
+                    <button data-diff="medium" class="diff-btn py-2.5 px-3 rounded-xl border-2 border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col items-center transition-all">
+                        <span class="text-xs font-extrabold text-amber-300">MEDIUM</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Balanced</span>
+                        <span class="text-[10px] font-mono text-amber-400 mt-1"><i class="fa-solid fa-coins mr-1"></i>+200</span>
+                    </button>
+                    <button data-diff="hard" class="diff-btn py-2.5 px-3 rounded-xl border-2 border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col items-center transition-all">
+                        <span class="text-xs font-extrabold text-rose-400">HARD</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Master AI</span>
+                        <span class="text-[10px] font-mono text-amber-300 font-bold mt-1"><i class="fa-solid fa-coins mr-1"></i>+4,000</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Neon Color Choice -->
+            <div class="mb-5 space-y-3">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">4. Player 1 Neon Color</label>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="p1-color-picker">
+                        <button data-color="cyan" class="p1-color-btn py-2 px-1.5 rounded-xl border-2 border-cyan-400 bg-cyan-950/50 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></span>
+                            <span class="text-[10px] font-bold text-cyan-200">Cyan</span>
+                        </button>
+                        <button data-color="magenta" class="p1-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-fuchsia-500 shadow-[0_0_10px_#ec4899]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Magenta</span>
+                        </button>
+                        <button data-color="emerald" class="p1-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Emerald</span>
+                        </button>
+                        <button data-color="amber" class="p1-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Solar</span>
+                        </button>
+                        <button data-color="violet" class="p1-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-violet-500 shadow-[0_0_10px_#8b5cf6]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Violet</span>
+                        </button>
+                        <button data-color="crimson" class="p1-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-rose-500 shadow-[0_0_10px_#f43f5e]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Crimson</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label id="p2-color-label" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">5. AI / Player 2 Neon Color</label>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="p2-color-picker">
+                        <button data-color="cyan" class="p2-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Cyan</span>
+                        </button>
+                        <button data-color="magenta" class="p2-color-btn py-2 px-1.5 rounded-xl border-2 border-fuchsia-400 bg-fuchsia-950/50 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-fuchsia-500 shadow-[0_0_10px_#ec4899]"></span>
+                            <span class="text-[10px] font-bold text-fuchsia-200">Magenta</span>
+                        </button>
+                        <button data-color="emerald" class="p2-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Emerald</span>
+                        </button>
+                        <button data-color="amber" class="p2-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Solar</span>
+                        </button>
+                        <button data-color="violet" class="p2-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-violet-500 shadow-[0_0_10px_#8b5cf6]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Violet</span>
+                        </button>
+                        <button data-color="crimson" class="p2-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all">
+                            <span class="w-4 h-4 rounded-full bg-rose-500 shadow-[0_0_10px_#f43f5e]"></span>
+                            <span class="text-[10px] font-bold text-slate-300">Crimson</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-start-match" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 via-indigo-500 to-fuchsia-600 hover:from-cyan-400 hover:to-fuchsia-500 text-white font-extrabold text-sm rounded-xl transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-play"></i>
+                <span>Start Match</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay Layer -->
+    <div class="ui-layer flex flex-col justify-between h-full p-4 md:p-6 pointer-events-none">
+        
+        <!-- Top HUD Header -->
+        <header class="flex flex-col lg:flex-row justify-between items-center gap-3 bg-cardBg/85 backdrop-blur-md p-3.5 md:p-4 rounded-2xl border border-slate-700/60 shadow-2xl interactive">
+            <div class="flex items-center justify-between w-full lg:w-auto">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-tr from-cyan-500 to-fuchsia-600 p-2.5 rounded-xl shadow-lg shadow-cyan-500/30">
+                        <i class="fa-solid fa-chess-board text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-cyan-300 via-indigo-300 to-fuchsia-400 bg-clip-text text-transparent">3D Neon Damki</h1>
+                        <p id="hud-mode-subtitle" class="text-xs text-slate-400">vs AI (Easy Mode)</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-400/90 mt-0.5">Created by VARADA</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Win Streak & Gold Coins Pills -->
+                <div class="flex lg:hidden items-center space-x-2">
+                    <div class="flex items-center space-x-1 bg-orange-950/60 border border-orange-500/50 px-2.5 py-1.5 rounded-xl shadow-inner">
+                        <span class="text-xs">🔥</span>
+                        <span id="hud-streak-mobile" class="font-mono font-bold text-xs text-orange-300">0/3</span>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-amber-950/60 border border-amber-500/50 px-3.5 py-1.5 rounded-xl shadow-inner">
+                        <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
+                        <span id="hud-coins-mobile" class="font-mono font-bold text-sm text-amber-300">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Turn & Score Status Bar -->
+            <div class="flex items-center space-x-3 md:space-x-5 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800 shadow-inner">
+                <!-- Player 1 -->
+                <div id="badge-p1" class="flex items-center space-x-2 px-3 py-1 rounded-lg border border-cyan-500/50 bg-cyan-950/40 transition-all">
+                    <span id="dot-p1" class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span>
+                    <span id="label-p1" class="text-xs font-bold text-cyan-300">P1:</span>
+                    <span id="score-p1" class="font-mono font-bold text-base text-white">12</span>
+                </div>
+
+                <!-- Turn Indicator -->
+                <div class="text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-200" id="turn-indicator">
+                    P1's Turn
+                </div>
+
+                <!-- Player 2 / AI -->
+                <div id="badge-p2" class="flex items-center space-x-2 px-3 py-1 rounded-lg border border-transparent opacity-60 transition-all">
+                    <span id="dot-p2" class="w-3 h-3 rounded-full bg-fuchsia-500 shadow-[0_0_8px_#ec4899]"></span>
+                    <span id="label-p2" class="text-xs font-bold text-fuchsia-300">AI:</span>
+                    <span id="score-p2" class="font-mono font-bold text-base text-white">12</span>
+                </div>
+            </div>
+
+            <!-- Top Controls & Gold Coins -->
+            <div class="flex items-center space-x-2">
+                <!-- Desktop Win Streak Pill -->
+                <div class="hidden lg:flex items-center space-x-1.5 bg-orange-950/60 border border-orange-500/50 px-3 py-2 rounded-xl shadow-inner" title="Win 3 games in a row for +3,000 bonus coins!">
+                    <span class="text-xs">🔥</span>
+                    <span id="hud-streak" class="font-mono font-bold text-xs text-orange-300">STREAK: 0/3</span>
+                </div>
+
+                <!-- Desktop Gold Coins Display -->
+                <div class="hidden lg:flex items-center space-x-2 bg-amber-950/60 border border-amber-500/50 px-3.5 py-2 rounded-xl shadow-inner mr-1">
+                    <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
+                    <span id="hud-coins" class="font-mono font-bold text-sm text-amber-300">0</span>
+                </div>
+
+                <button id="btn-open-menu" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold text-xs rounded-xl border border-slate-700/80 transition-all flex items-center space-x-1.5 shadow-md">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Menu</span>
+                </button>
+                <button id="btn-reset" class="px-3.5 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center space-x-1.5">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Restart</span>
+                </button>
+                <button id="btn-sound" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700/80 transition-all shadow-md">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-xs"></i>
+                </button>
+                <button id="btn-help" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700/80 transition-all shadow-md">
+                    <i class="fa-solid fa-question text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Status Toast / Notification -->
+        <div id="status-toast" class="hidden self-center bg-slate-900/90 border border-amber-500/60 backdrop-blur-md px-5 py-2 rounded-full shadow-lg text-xs font-bold text-amber-300 tracking-wide">
+            Mandatory Jump Available!
+        </div>
+
+        <!-- Match Start Welcome Banner -->
+        <div id="welcome-banner" class="hidden self-center bg-cardBg/95 border border-cyan-400/70 backdrop-blur-xl px-8 py-5 rounded-3xl shadow-2xl text-center pointer-events-none transition-all duration-500 transform scale-95 opacity-0">
+            <p class="text-[11px] font-extrabold uppercase tracking-[0.25em] text-fuchsia-400 mb-1">Cyber Arena Ready</p>
+            <h2 id="welcome-text" class="text-2xl md:text-3xl font-black bg-gradient-to-r from-cyan-300 via-white to-fuchsia-300 bg-clip-text text-transparent">
+                Welcome! Player 1
+            </h2>
+        </div>
+
+        <!-- Victory Modal Banner -->
+        <div id="win-modal" class="hidden self-center bg-cardBg/95 border border-cyan-500/60 backdrop-blur-xl px-8 py-7 rounded-3xl shadow-2xl interactive text-center max-w-sm w-full">
+            <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-tr from-cyan-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <i class="fa-solid fa-trophy text-3xl text-white"></i>
+            </div>
+            <h2 id="win-title" class="text-2xl font-extrabold text-white mb-1">Player 1 Wins!</h2>
+            <p id="win-subtitle" class="text-xs text-slate-400 mb-4">All opponent pieces have been captured.</p>
+            
+            <!-- Coin Reward Badge -->
+            <div id="reward-badge" class="mb-3 py-2.5 px-4 rounded-xl bg-amber-950/60 border border-amber-500/50 inline-flex items-center space-x-2">
+                <i class="fa-solid fa-coins text-amber-400 text-base"></i>
+                <span id="reward-text" class="font-mono font-extrabold text-sm text-amber-300">+200 Gold Coins!</span>
+            </div>
+
+            <!-- 3-Win Streak Bonus Highlight Badge -->
+            <div id="streak-bonus-badge" class="hidden mb-5 py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-950/90 via-amber-900/90 to-orange-950/90 border-2 border-orange-400 shadow-[0_0_20px_rgba(251,146,60,0.45)] animate-pulse">
+                <div class="text-xs font-black uppercase tracking-wider text-orange-300">
+                    🔥 +3,000 COIN 3-WIN STREAK BONUS! 🔥
+                </div>
+            </div>
+
+            <div class="flex space-x-2.5 mt-2">
+                <button id="btn-win-menu" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all">
+                    Change Settings
+                </button>
+                <button id="btn-play-again" class="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-fuchsia-600 hover:from-cyan-400 hover:to-fuchsia-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-fuchsia-500/25">
+                    Play Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Controls Bar -->
+        <footer class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-cardBg/85 backdrop-blur-md px-5 py-3 rounded-2xl border border-slate-700/60 shadow-2xl interactive">
+            <div class="text-xs text-slate-400">
+                <span class="font-semibold text-cyan-300"><i class="fa-solid fa-hand-pointer mr-1"></i> Controls:</span> Click a piece to select, click a glowing tile to move. Drag background to rotate 3D camera.
+            </div>
+            <button id="btn-camera" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700/80 transition-all flex items-center space-x-2">
+                <i class="fa-solid fa-video text-fuchsia-400"></i>
+                <span>Reset Camera</span>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md hidden interactive p-4">
+        <div class="bg-cardBg border border-slate-700 max-w-md w-full p-6 rounded-2xl shadow-2xl relative">
+            <button id="btn-close-help" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-cyan-500/20 p-2.5 rounded-xl border border-cyan-500/30">
+                    <i class="fa-solid fa-circle-info text-cyan-400 text-lg"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">How to Play Neon Damki</h3>
+            </div>
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300 mb-6">
+                <li class="flex items-start space-x-2.5">
+                    <i class="fa-solid fa-arrows-up-down-left-right text-cyan-400 mt-1"></i>
+                    <span><strong>Movement:</strong> Pieces move diagonally forward onto dark tiles.</span>
+                </li>
+                <li class="flex items-start space-x-2.5">
+                    <i class="fa-solid fa-bolt text-amber-400 mt-1"></i>
+                    <span><strong>Captures & Multi-Jumps:</strong> Jump diagonally over an opponent's piece to capture it. If a capture is available, you must take it! Chain multiple jumps in a single turn.</span>
+                </li>
+                <li class="flex items-start space-x-2.5">
+                    <i class="fa-solid fa-coins text-yellow-400 mt-1"></i>
+                    <span><strong>Gold Coin Rewards:</strong> Win any match to earn <strong>200 Gold Coins</strong>, or conquer <strong>Hard Mode AI</strong> to win a massive <strong>4,000 Gold Coins</strong>!</span>
+                </li>
+            </ul>
+            <button id="btn-got-it" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-fuchsia-600 hover:from-cyan-400 hover:to-fuchsia-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg">
+                Start Playing
+            </button>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script>
+        /* 3D Neon Damki (Checkers) Engine with Three.js & Web Audio API */
+
+        // Constants & Players
+        const PLAYER1 = 1;
+        const PLAYER2 = 2;
+        const BOARD_SIZE = 8;
+        const TILE_SIZE = 1.6;
+
+        // Three.js Globals
+        let scene, camera, renderer, controls;
+        let boardGroup, piecesGroup, highlightsGroup, particlesGroup;
+        let tileMeshes = [];
+        let pieceMeshes = [];
+        let highlightMeshes = [];
+        let particles = [];
+        let killEffects = [];
+        let fireworkInterval = null;
+        let cameraShake = 0;
+
+        // Raycasting
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let pointerDownPos = { x: 0, y: 0 };
+
+        // Game State & Settings
+        let board = [];
+        let turn = PLAYER1;
+        let selectedPiece = null;
+        let validMoves = [];
+        let mustContinueJumpFrom = null;
+        let isAnimating = false;
+        let vsAI = true;
+        let aiDifficulty = 'easy'; // 'easy' | 'medium' | 'hard'
+        let gameOver = false;
+        let goldCoins = 0;
+        let winStreak = 0;
+
+        // Audio
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        // Player Identity & Color Themes
+        let p1Name = "Player 1";
+        let p1Number = "01";
+        let p2Name = "Player 2";
+        let p2Number = "02";
+
+        const COLOR_THEMES = {
+            cyan: {
+                name: 'Cyan',
+                hex: 0x06b6d4,
+                emissive: 0x0e7490,
+                ring: 0x67e8f9,
+                cssDot: 'bg-cyan-400 shadow-[0_0_8px_#22d3ee]',
+                cssText: 'text-cyan-300',
+                cssBadge: 'border-cyan-500/50 bg-cyan-950/40'
+            },
+            magenta: {
+                name: 'Magenta',
+                hex: 0xec4899,
+                emissive: 0xbe185d,
+                ring: 0xf9a8d4,
+                cssDot: 'bg-fuchsia-500 shadow-[0_0_8px_#ec4899]',
+                cssText: 'text-fuchsia-300',
+                cssBadge: 'border-fuchsia-500/50 bg-fuchsia-950/40'
+            },
+            emerald: {
+                name: 'Emerald',
+                hex: 0x10b981,
+                emissive: 0x047857,
+                ring: 0x6ee7b7,
+                cssDot: 'bg-emerald-400 shadow-[0_0_8px_#34d399]',
+                cssText: 'text-emerald-300',
+                cssBadge: 'border-emerald-500/50 bg-emerald-950/40'
+            },
+            amber: {
+                name: 'Solar',
+                hex: 0xf59e0b,
+                emissive: 0xb45309,
+                ring: 0xfde68a,
+                cssDot: 'bg-amber-400 shadow-[0_0_8px_#fbbf24]',
+                cssText: 'text-amber-300',
+                cssBadge: 'border-amber-500/50 bg-amber-950/40'
+            },
+            violet: {
+                name: 'Violet',
+                hex: 0x8b5cf6,
+                emissive: 0x5b21b6,
+                ring: 0xc4b5fd,
+                cssDot: 'bg-violet-500 shadow-[0_0_8px_#8b5cf6]',
+                cssText: 'text-violet-300',
+                cssBadge: 'border-violet-500/50 bg-violet-950/40'
+            },
+            crimson: {
+                name: 'Crimson',
+                hex: 0xf43f5e,
+                emissive: 0xbe123c,
+                ring: 0xfda4af,
+                cssDot: 'bg-rose-500 shadow-[0_0_8px_#f43f5e]',
+                cssText: 'text-rose-300',
+                cssBadge: 'border-rose-500/50 bg-rose-950/40'
+            }
+        };
+
+        let p1ColorKey = 'cyan';
+        let p2ColorKey = 'magenta';
+
+        const COLORS = {
+            tileDark: 0x0f172a,
+            tileLight: 0x1e293b,
+            boardFrame: 0x090d16,
+            kingCrown: 0xfacc15,
+            highlightValid: 0x10b981,
+            highlightCapture: 0xf59e0b,
+            highlightSelected: 0x38bdf8
+        };
+
+        // Persistent Gold Coins & Win Streak Helpers
+        function loadCoins() {
+            const saved = localStorage.getItem('neon_damki_coins');
+            goldCoins = saved ? parseInt(saved, 10) : 0;
+            const savedStreak = localStorage.getItem('neon_damki_streak');
+            winStreak = savedStreak ? parseInt(savedStreak, 10) : 0;
+            updateCoinsUI();
+            updateStreakUI();
+        }
+
+        function addCoins(amount) {
+            goldCoins += amount;
+            localStorage.setItem('neon_damki_coins', goldCoins.toString());
+            updateCoinsUI();
+        }
+
+        function saveStreak(newStreak) {
+            winStreak = newStreak;
+            localStorage.setItem('neon_damki_streak', winStreak.toString());
+            updateStreakUI();
+        }
+
+        function updateStreakUI() {
+            const cycleProgress = winStreak > 0 && winStreak % 3 === 0 ? 3 : winStreak % 3;
+            const streakLabel = `STREAK: ${cycleProgress}/3`;
+            document.getElementById('hud-streak').innerText = streakLabel;
+            document.getElementById('menu-streak').innerText = streakLabel;
+            document.getElementById('hud-streak-mobile').innerText = `${cycleProgress}/3`;
+        }
+
+        function updateCoinsUI() {
+            const formatted = goldCoins.toLocaleString();
+            document.getElementById('hud-coins').innerText = formatted;
+            document.getElementById('hud-coins-mobile').innerText = formatted;
+            document.getElementById('menu-coins').innerText = formatted;
+        }
+
+        // Web Audio Sound Synthesizer
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'select') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(780, now + 0.06);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'move') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(180, now + 0.12);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'capture') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(240, now);
+                    osc.frequency.exponentialRampToValueAtTime(620, now + 0.18);
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                } else if (type === 'king') {
+                    const freqs = [523.25, 659.25, 783.99, 1046.5];
+                    freqs.forEach((f, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'sine';
+                        o.frequency.setValueAtTime(f, now + idx * 0.07);
+                        g.gain.setValueAtTime(0.15, now + idx * 0.07);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.07 + 0.2);
+                        o.start(now + idx * 0.07);
+                        o.stop(now + idx * 0.07 + 0.2);
+                    });
+                } else if (type === 'streak_bonus') {
+                    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98];
+                    notes.forEach((f, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(f, now + idx * 0.08);
+                        g.gain.setValueAtTime(0.22, now + idx * 0.08);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.35);
+                        o.start(now + idx * 0.08);
+                        o.stop(now + idx * 0.08 + 0.35);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Loading Screen Progression
+        function runLoadingScreen(onComplete) {
+            const bar = document.getElementById('loading-bar');
+            const status = document.getElementById('loading-status');
+            const screen = document.getElementById('loading-screen');
+            const steps = [
+                { pct: 25, text: 'Building 3D Neon Table...' },
+                { pct: 55, text: 'Calibrating Cyber Shaders...' },
+                { pct: 85, text: 'Charging Damki Pieces...' },
+                { pct: 100, text: 'Arena Ready!' }
+            ];
+            let i = 0;
+            const timer = setInterval(() => {
+                if (i < steps.length) {
+                    bar.style.width = steps[i].pct + '%';
+                    status.innerText = steps[i].text;
+                    i++;
+                } else {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        screen.classList.add('opacity-0');
+                        setTimeout(() => {
+                            screen.style.display = 'none';
+                            if (onComplete) onComplete();
+                        }, 450);
+                    }, 250);
+                }
+            }, 260);
+        }
+
+        // Initialize Three.js Scene
+        function init() {
+            const container = document.getElementById('canvas-container');
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x060811, 0.022);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            resetCameraPosition();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.06;
+            controls.maxPolarAngle = Math.PI / 2.15;
+            controls.minDistance = 8;
+            controls.maxDistance = 28;
+
+            // Studio & Neon Arena Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.75);
+            dirLight.position.set(10, 22, 12);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            scene.add(dirLight);
+
+            const cyanLight = new THREE.PointLight(0x06b6d4, 1.3, 30);
+            cyanLight.position.set(-8, 6, 8);
+            scene.add(cyanLight);
+
+            const magentaLight = new THREE.PointLight(0xec4899, 1.3, 30);
+            magentaLight.position.set(8, 6, -8);
+            scene.add(magentaLight);
+
+            boardGroup = new THREE.Group();
+            piecesGroup = new THREE.Group();
+            highlightsGroup = new THREE.Group();
+            particlesGroup = new THREE.Group();
+            scene.add(boardGroup);
+            scene.add(piecesGroup);
+            scene.add(highlightsGroup);
+            scene.add(particlesGroup);
+
+            loadCoins();
+            build3DBoard();
+            resetGameState();
+            setupMenuHandlers();
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
+            const canvas = renderer.domElement;
+            canvas.addEventListener('pointerdown', onPointerDown);
+            canvas.addEventListener('pointerup', onPointerUp);
+
+            // HUD & Modal Buttons
+            document.getElementById('btn-open-menu').addEventListener('click', openSetupMenu);
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                initAudio();
+                resetGameState();
+                showWelcomeBanner();
+            });
+            document.getElementById('btn-play-again').addEventListener('click', () => {
+                initAudio();
+                resetGameState();
+                showWelcomeBanner();
+            });
+            document.getElementById('btn-win-menu').addEventListener('click', () => {
+                document.getElementById('win-modal').classList.add('hidden');
+                stopVictoryFireworks();
+                openSetupMenu();
+            });
+            document.getElementById('btn-camera').addEventListener('click', resetCameraPosition);
+            document.getElementById('btn-sound').addEventListener('click', toggleSound);
+            document.getElementById('btn-help').addEventListener('click', () => toggleHelpModal(true));
+            document.getElementById('btn-close-help').addEventListener('click', () => toggleHelpModal(false));
+            document.getElementById('btn-got-it').addEventListener('click', () => toggleHelpModal(false));
+
+            requestAnimationFrame(animate);
+
+            runLoadingScreen(() => {
+                openSetupMenu();
+            });
+        }
+
+        function setupMenuHandlers() {
+            const btnAi = document.getElementById('select-mode-ai');
+            const btn2p = document.getElementById('select-mode-2p');
+            const diffSection = document.getElementById('ai-difficulty-section');
+            const p2IdentityRow = document.getElementById('p2-identity-row');
+            const p2ColorLabel = document.getElementById('p2-color-label');
+
+            btnAi.addEventListener('click', () => {
+                vsAI = true;
+                btnAi.className = "py-2.5 px-4 rounded-xl border-2 border-cyan-500 bg-cyan-950/40 text-white font-bold text-sm flex items-center justify-center space-x-2 transition-all";
+                btn2p.className = "py-2.5 px-4 rounded-xl border-2 border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white font-bold text-sm flex items-center justify-center space-x-2 transition-all";
+                diffSection.classList.remove('hidden');
+                p2IdentityRow.classList.add('hidden');
+                p2ColorLabel.innerText = "5. AI Neon Color";
+            });
+
+            btn2p.addEventListener('click', () => {
+                vsAI = false;
+                btn2p.className = "py-2.5 px-4 rounded-xl border-2 border-fuchsia-500 bg-fuchsia-950/40 text-white font-bold text-sm flex items-center justify-center space-x-2 transition-all";
+                btnAi.className = "py-2.5 px-4 rounded-xl border-2 border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white font-bold text-sm flex items-center justify-center space-x-2 transition-all";
+                diffSection.classList.add('hidden');
+                p2IdentityRow.classList.remove('hidden');
+                p2ColorLabel.innerText = "5. Player 2 Neon Color";
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    aiDifficulty = btn.getAttribute('data-diff');
+                    document.querySelectorAll('.diff-btn').forEach(b => {
+                        b.className = "diff-btn py-2.5 px-3 rounded-xl border-2 border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col items-center transition-all";
+                    });
+                    const borderCol = aiDifficulty === 'easy' ? 'border-emerald-500 bg-emerald-950/40' :
+                                      aiDifficulty === 'medium' ? 'border-amber-500 bg-amber-950/40' :
+                                      'border-rose-500 bg-rose-950/40';
+                    btn.className = `diff-btn py-2.5 px-3 rounded-xl border-2 ${borderCol} text-white flex flex-col items-center transition-all`;
+                });
+            });
+
+            // Player 1 Color buttons
+            document.querySelectorAll('.p1-color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    p1ColorKey = btn.getAttribute('data-color');
+                    document.querySelectorAll('.p1-color-btn').forEach(b => {
+                        b.className = "p1-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all";
+                    });
+                    btn.className = "p1-color-btn py-2 px-1.5 rounded-xl border-2 border-cyan-400 bg-cyan-950/50 flex flex-col items-center space-y-1 transition-all";
+                });
+            });
+
+            // Player 2 / AI Color buttons
+            document.querySelectorAll('.p2-color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    p2ColorKey = btn.getAttribute('data-color');
+                    document.querySelectorAll('.p2-color-btn').forEach(b => {
+                        b.className = "p2-color-btn py-2 px-1.5 rounded-xl border-2 border-slate-800 bg-slate-900/60 flex flex-col items-center space-y-1 transition-all";
+                    });
+                    btn.className = "p2-color-btn py-2 px-1.5 rounded-xl border-2 border-fuchsia-400 bg-fuchsia-950/50 flex flex-col items-center space-y-1 transition-all";
+                });
+            });
+
+            // Start Match button
+            document.getElementById('btn-start-match').addEventListener('click', () => {
+                initAudio();
+                const rawP1Name = document.getElementById('input-p1-name').value.trim();
+                const rawP1Num = document.getElementById('input-p1-num').value.trim();
+                const rawP2Name = document.getElementById('input-p2-name').value.trim();
+                const rawP2Num = document.getElementById('input-p2-num').value.trim();
+
+                p1Name = rawP1Name || "Player 1";
+                p1Number = rawP1Num || "01";
+                p2Name = rawP2Name || "Player 2";
+                p2Number = rawP2Num || "02";
+
+                document.getElementById('setup-modal').classList.add('hidden');
+                resetGameState();
+                showWelcomeBanner();
+            });
+        }
+
+        function openSetupMenu() {
+            updateCoinsUI();
+            updateStreakUI();
+            document.getElementById('setup-modal').classList.remove('hidden');
+        }
+
+        function showWelcomeBanner() {
+            const banner = document.getElementById('welcome-banner');
+            const text = document.getElementById('welcome-text');
+            text.innerText = vsAI
+                ? `Welcome! ${p1Name} #${p1Number}`
+                : `Welcome! ${p1Name} #${p1Number} vs ${p2Name} #${p2Number}`;
+            banner.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                banner.classList.remove('opacity-0', 'scale-95');
+                banner.classList.add('opacity-100', 'scale-100');
+            });
+            setTimeout(() => {
+                banner.classList.remove('opacity-100', 'scale-100');
+                banner.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => banner.classList.add('hidden'), 500);
+            }, 2400);
+        }
+
+        function resetCameraPosition() {
+            camera.position.set(0, 14.5, 13.5);
+            camera.lookAt(0, 0, 0);
+            if (controls) {
+                controls.target.set(0, 0, 0);
+                controls.update();
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-icon').className = soundEnabled ? 'fa-solid fa-volume-high text-xs' : 'fa-solid fa-volume-xmark text-xs';
+        }
+
+        function toggleHelpModal(show) {
+            const modal = document.getElementById('help-modal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        // Convert board (row, col) to 3D world (x, z)
+        function boardToWorld(row, col) {
+            const offset = (BOARD_SIZE - 1) * TILE_SIZE / 2;
+            return {
+                x: col * TILE_SIZE - offset,
+                z: row * TILE_SIZE - offset
+            };
+        }
+
+        // Build 3D Illuminated Board & Neon Table
+        function build3DBoard() {
+            const totalSize = BOARD_SIZE * TILE_SIZE;
+
+            // 1. Cyber Neon Table Underneath Board
+            const tableWidth = totalSize + 6.4;
+            const tableDepth = totalSize + 6.4;
+            const tableTopGeo = new THREE.BoxGeometry(tableWidth, 0.5, tableDepth);
+            const tableTopMat = new THREE.MeshStandardMaterial({ color: 0x050811, roughness: 0.25, metalness: 0.85 });
+            const tableTop = new THREE.Mesh(tableTopGeo, tableTopMat);
+            tableTop.position.y = -0.82;
+            tableTop.receiveShadow = true;
+            boardGroup.add(tableTop);
+
+            // Neon Cyan & Magenta Edge Trim around Table
+            const trimEdges = new THREE.EdgesGeometry(new THREE.BoxGeometry(tableWidth + 0.04, 0.52, tableDepth + 0.04));
+            const trimMat = new THREE.LineBasicMaterial({ color: 0x06b6d4 });
+            const trimLines = new THREE.LineSegments(trimEdges, trimMat);
+            trimLines.position.y = -0.82;
+            boardGroup.add(trimLines);
+
+            // Glowing Side Strips on Table
+            const stripFront = new THREE.Mesh(
+                new THREE.BoxGeometry(tableWidth - 0.6, 0.1, 0.12),
+                new THREE.MeshBasicMaterial({ color: 0xec4899 })
+            );
+            stripFront.position.set(0, -0.82, tableDepth / 2 + 0.02);
+            boardGroup.add(stripFront);
+
+            const stripBack = stripFront.clone();
+            stripBack.position.z = -tableDepth / 2 - 0.02;
+            boardGroup.add(stripBack);
+
+            // 4 Illuminated Cyber Table Legs
+            const legGeo = new THREE.CylinderGeometry(0.32, 0.22, 8, 12);
+            const legMat = new THREE.MeshStandardMaterial({ color: 0x090d16, metalness: 0.9, roughness: 0.2 });
+            const legOffsets = [
+                [-tableWidth / 2 + 1.1, -tableDepth / 2 + 1.1],
+                [tableWidth / 2 - 1.1, -tableDepth / 2 + 1.1],
+                [-tableWidth / 2 + 1.1, tableDepth / 2 - 1.1],
+                [tableWidth / 2 - 1.1, tableDepth / 2 - 1.1]
+            ];
+            legOffsets.forEach(([lx, lz]) => {
+                const leg = new THREE.Mesh(legGeo, legMat);
+                leg.position.set(lx, -5.0, lz);
+                boardGroup.add(leg);
+
+                const neonRing = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.35, 0.04, 8, 24),
+                    new THREE.MeshBasicMaterial({ color: 0x06b6d4 })
+                );
+                neonRing.rotation.x = Math.PI / 2;
+                neonRing.position.set(lx, -1.3, lz);
+                boardGroup.add(neonRing);
+            });
+
+            // "Created by VARADA" Engraved Neon Plaque on Front Table Rim
+            const plaqueCanvas = document.createElement('canvas');
+            plaqueCanvas.width = 512;
+            plaqueCanvas.height = 96;
+            const pCtx = plaqueCanvas.getContext('2d');
+            pCtx.fillStyle = '#050811';
+            pCtx.fillRect(0, 0, 512, 96);
+            pCtx.strokeStyle = '#06b6d4';
+            pCtx.lineWidth = 4;
+            pCtx.strokeRect(4, 4, 504, 88);
+            pCtx.font = 'bold 34px Inter, sans-serif';
+            pCtx.fillStyle = '#67e8f9';
+            pCtx.textAlign = 'center';
+            pCtx.textBaseline = 'middle';
+            pCtx.fillText('CREATED BY VARADA', 256, 48);
+
+            const plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
+            const plaqueMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(5.2, 0.95),
+                new THREE.MeshBasicMaterial({ map: plaqueTex })
+            );
+            plaqueMesh.rotation.x = -Math.PI / 2;
+            plaqueMesh.position.set(0, -0.56, totalSize / 2 + 1.85);
+            boardGroup.add(plaqueMesh);
+
+            // 2. Outer Neon Arena Frame
+            const frameGeo = new THREE.BoxGeometry(totalSize + 1.4, 0.55, totalSize + 1.4);
+            const frameMat = new THREE.MeshStandardMaterial({ color: COLORS.boardFrame, roughness: 0.3, metalness: 0.7 });
+            const frame = new THREE.Mesh(frameGeo, frameMat);
+            frame.position.y = -0.32;
+            frame.receiveShadow = true;
+            boardGroup.add(frame);
+
+            // Outer Glowing Rim Ring
+            const rimGeo = new THREE.PlaneGeometry(totalSize + 1.65, totalSize + 1.65);
+            const rimMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.32, side: THREE.DoubleSide });
+            const rim = new THREE.Mesh(rimGeo, rimMat);
+            rim.rotation.x = -Math.PI / 2;
+            rim.position.y = -0.55;
+            boardGroup.add(rim);
+
+            // Neon Accent Strips around Board Border
+            const stripGeo = new THREE.BoxGeometry(totalSize + 1.46, 0.08, totalSize + 1.46);
+            const stripMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
+            const strip = new THREE.Mesh(stripGeo, stripMat);
+            strip.position.y = -0.05;
+            boardGroup.add(strip);
+
+            // 8x8 Tiles
+            const tileGeo = new THREE.BoxGeometry(TILE_SIZE * 0.98, 0.16, TILE_SIZE * 0.98);
+            const tileEdgeGeo = new THREE.EdgesGeometry(tileGeo);
+
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                tileMeshes[r] = [];
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const isDark = (r + c) % 2 === 1;
+                    const mat = new THREE.MeshStandardMaterial({
+                        color: isDark ? COLORS.tileDark : COLORS.tileLight,
+                        roughness: isDark ? 0.25 : 0.45,
+                        metalness: isDark ? 0.4 : 0.1
+                    });
+                    const tile = new THREE.Mesh(tileGeo, mat);
+                    const pos = boardToWorld(r, c);
+                    tile.position.set(pos.x, -0.08, pos.z);
+                    tile.receiveShadow = true;
+                    tile.userData = { type: 'tile', row: r, col: c, isDark };
+
+                    if (isDark) {
+                        const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a8a, transparent: true, opacity: 0.45 });
+                        const edges = new THREE.LineSegments(tileEdgeGeo, edgeMat);
+                        tile.add(edges);
+                    }
+
+                    boardGroup.add(tile);
+                    tileMeshes[r][c] = tile;
+                }
+            }
+        }
+
+        // Create 3D Neon Piece Mesh
+        function createPieceMesh(player, isKing) {
+            const group = new THREE.Group();
+            const theme = player === PLAYER1 ? COLOR_THEMES[p1ColorKey] : COLOR_THEMES[p2ColorKey];
+
+            const baseGeo = new THREE.CylinderGeometry(0.56, 0.62, 0.24, 32);
+            const baseMat = new THREE.MeshStandardMaterial({
+                color: theme.hex,
+                emissive: theme.emissive,
+                emissiveIntensity: 0.7,
+                roughness: 0.2,
+                metalness: 0.5
+            });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.castShadow = true;
+            base.receiveShadow = true;
+            group.add(base);
+
+            const ringGeo = new THREE.TorusGeometry(0.42, 0.045, 16, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: theme.ring });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+            ring.position.y = 0.13;
+            group.add(ring);
+
+            // Glowing base halo under piece
+            const haloGeo = new THREE.RingGeometry(0.45, 0.68, 32);
+            const haloMat = new THREE.MeshBasicMaterial({ color: theme.hex, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+            const halo = new THREE.Mesh(haloGeo, haloMat);
+            halo.rotation.x = -Math.PI / 2;
+            halo.position.y = -0.11;
+            group.add(halo);
+
+            if (isKing) {
+                addKingCrown(group);
+            }
+
+            return group;
+        }
+
+        function addKingCrown(pieceGroup) {
+            const crownGeo = new THREE.TorusGeometry(0.24, 0.05, 12, 24);
+            const crownMat = new THREE.MeshStandardMaterial({
+                color: COLORS.kingCrown,
+                emissive: 0xd97706,
+                emissiveIntensity: 0.85,
+                metalness: 0.8,
+                roughness: 0.1
+            });
+            const crown = new THREE.Mesh(crownGeo, crownMat);
+            crown.rotation.x = Math.PI / 2;
+            crown.position.y = 0.22;
+            crown.userData.isCrown = true;
+            pieceGroup.add(crown);
+        }
+
+        // Reset Game State & Populate Starting Pieces
+        function resetGameState() {
+            while (piecesGroup.children.length > 0) {
+                piecesGroup.remove(piecesGroup.children[0]);
+            }
+            clearHighlights();
+            stopVictoryFireworks();
+
+            board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+            pieceMeshes = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+
+            turn = PLAYER1;
+            selectedPiece = null;
+            validMoves = [];
+            mustContinueJumpFrom = null;
+            isAnimating = false;
+            gameOver = false;
+
+            document.getElementById('win-modal').classList.add('hidden');
+            document.getElementById('status-toast').classList.add('hidden');
+
+            // Update Mode & Color HUD styling
+            const t1 = COLOR_THEMES[p1ColorKey];
+            const t2 = COLOR_THEMES[p2ColorKey];
+            document.getElementById('hud-mode-subtitle').innerText = vsAI
+                ? `vs AI (${aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)} Mode)`
+                : `${p1Name} vs ${p2Name} (2P)`;
+            document.getElementById('dot-p1').className = `w-3 h-3 rounded-full ${t1.cssDot}`;
+            document.getElementById('label-p1').className = `text-xs font-bold ${t1.cssText}`;
+            document.getElementById('label-p1').innerText = `${p1Name} #${p1Number}:`;
+
+            document.getElementById('dot-p2').className = `w-3 h-3 rounded-full ${t2.cssDot}`;
+            document.getElementById('label-p2').className = `text-xs font-bold ${t2.cssText}`;
+            document.getElementById('label-p2').innerText = vsAI ? 'AI:' : `${p2Name} #${p2Number}:`;
+
+            // Spawn pieces on dark squares
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if ((r + c) % 2 === 1) {
+                        if (r < 3) {
+                            placePiece(r, c, PLAYER2, false);
+                        } else if (r > 4) {
+                            placePiece(r, c, PLAYER1, false);
+                        }
+                    }
+                }
+            }
+
+            updateHUD();
+        }
+
+        function placePiece(r, c, player, isKing) {
+            board[r][c] = { player, isKing };
+            const mesh = createPieceMesh(player, isKing);
+            const pos = boardToWorld(r, c);
+            mesh.position.set(pos.x, 0.12, pos.z);
+            mesh.userData = { type: 'piece', row: r, col: c };
+            piecesGroup.add(mesh);
+            pieceMeshes[r][c] = mesh;
+        }
+
+        // Checkers / Damki Move Generation
+        function getPieceMoves(r, c, boardState = board) {
+            const piece = boardState[r][c];
+            if (!piece) return [];
+
+            const moves = [];
+            const dirs = [];
+
+            if (piece.player === PLAYER1 || piece.isKing) {
+                dirs.push({ dr: -1, dc: -1 }, { dr: -1, dc: 1 });
+            }
+            if (piece.player === PLAYER2 || piece.isKing) {
+                dirs.push({ dr: 1, dc: -1 }, { dr: 1, dc: 1 });
+            }
+
+            for (const d of dirs) {
+                const nr = r + d.dr;
+                const nc = c + d.dc;
+                if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                    if (boardState[nr][nc] === null) {
+                        moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isJump: false });
+                    } else if (boardState[nr][nc].player !== piece.player) {
+                        const jr = nr + d.dr;
+                        const jc = nc + d.dc;
+                        if (jr >= 0 && jr < BOARD_SIZE && jc >= 0 && jc < BOARD_SIZE && boardState[jr][jc] === null) {
+                            moves.push({
+                                fromR: r, fromC: c,
+                                toR: jr, toC: jc,
+                                isJump: true,
+                                capR: nr, capC: nc
+                            });
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
+
+        function getAllValidMoves(player, boardState = board, restrictTo = null) {
+            let allMoves = [];
+            if (restrictTo) {
+                allMoves = getPieceMoves(restrictTo.r, restrictTo.c, boardState).filter(m => m.isJump);
+                return allMoves;
+            }
+
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (boardState[r][c] && boardState[r][c].player === player) {
+                        allMoves.push(...getPieceMoves(r, c, boardState));
+                    }
+                }
+            }
+
+            // Mandatory capture rule
+            const jumps = allMoves.filter(m => m.isJump);
+            return jumps.length > 0 ? jumps : allMoves;
+        }
+
+        // Visual Highlights
+        function clearHighlights() {
+            while (highlightsGroup.children.length > 0) {
+                highlightsGroup.remove(highlightsGroup.children[0]);
+            }
+            highlightMeshes = [];
+        }
+
+        function renderHighlights() {
+            clearHighlights();
+            if (!selectedPiece) return;
+
+            const selPos = boardToWorld(selectedPiece.r, selectedPiece.c);
+            const selRing = new THREE.Mesh(
+                new THREE.RingGeometry(0.62, 0.75, 32),
+                new THREE.MeshBasicMaterial({ color: COLORS.highlightSelected, side: THREE.DoubleSide })
+            );
+            selRing.rotation.x = -Math.PI / 2;
+            selRing.position.set(selPos.x, 0.02, selPos.z);
+            highlightsGroup.add(selRing);
+
+            validMoves.forEach(move => {
+                const pos = boardToWorld(move.toR, move.toC);
+                const disc = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.45, 0.45, 0.05, 24),
+                    new THREE.MeshBasicMaterial({
+                        color: move.isJump ? COLORS.highlightCapture : COLORS.highlightValid,
+                        transparent: true,
+                        opacity: 0.78
+                    })
+                );
+                disc.position.set(pos.x, 0.03, pos.z);
+                disc.userData = { type: 'highlight', move };
+                highlightsGroup.add(disc);
+                highlightMeshes.push(disc);
+            });
+        }
+
+        // Pointer Click Handling
+        function onPointerDown(e) {
+            pointerDownPos = { x: e.clientX, y: e.clientY };
+        }
+
+        function onPointerUp(e) {
+            if (isAnimating || gameOver) return;
+            if (vsAI && turn === PLAYER2) return;
+
+            const dx = e.clientX - pointerDownPos.x;
+            const dy = e.clientY - pointerDownPos.y;
+            if (Math.hypot(dx, dy) > 8) return;
+
+            initAudio();
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // 1. Check highlight discs
+            const hitHighlights = raycaster.intersectObjects(highlightMeshes);
+            if (hitHighlights.length > 0) {
+                executeMove(hitHighlights[0].object.userData.move);
+                return;
+            }
+
+            // 2. Check tiles
+            const allTiles = tileMeshes.flat();
+            const hitTiles = raycaster.intersectObjects(allTiles);
+            if (hitTiles.length > 0) {
+                const { row, col } = hitTiles[0].object.userData;
+                const moveMatch = validMoves.find(m => m.toR === row && m.toC === col);
+                if (moveMatch) {
+                    executeMove(moveMatch);
+                    return;
+                }
+            }
+
+            // 3. Check pieces
+            const allPieces = piecesGroup.children;
+            const hitPieces = raycaster.intersectObjects(allPieces, true);
+            if (hitPieces.length > 0) {
+                let obj = hitPieces[0].object;
+                while (obj.parent && obj.parent !== piecesGroup) {
+                    obj = obj.parent;
+                }
+                if (obj.userData && obj.userData.type === 'piece') {
+                    selectPieceAt(obj.userData.row, obj.userData.col);
+                }
+            }
+        }
+
+        function selectPieceAt(r, c) {
+            const piece = board[r][c];
+            if (!piece || piece.player !== turn) return;
+
+            if (mustContinueJumpFrom && (mustContinueJumpFrom.r !== r || mustContinueJumpFrom.c !== c)) {
+                showToast("Finish your multi-jump chain!");
+                return;
+            }
+
+            const legalTurnMoves = getAllValidMoves(turn, board, mustContinueJumpFrom);
+            const pieceLegalMoves = legalTurnMoves.filter(m => m.fromR === r && m.fromC === c);
+
+            if (pieceLegalMoves.length === 0) {
+                if (legalTurnMoves.some(m => m.isJump)) {
+                    showToast("Capture available! You must jump.");
+                }
+                return;
+            }
+
+            selectedPiece = { r, c };
+            validMoves = pieceLegalMoves;
+            playSound('select');
+            renderHighlights();
+        }
+
+        // Execute Animated Move
+        function executeMove(move) {
+            isAnimating = true;
+            clearHighlights();
+
+            const movingPieceData = board[move.fromR][move.fromC];
+            const mesh = pieceMeshes[move.fromR][move.fromC];
+
+            board[move.fromR][move.fromC] = null;
+            pieceMeshes[move.fromR][move.fromC] = null;
+
+            const startPos = mesh.position.clone();
+            const targetWorld = boardToWorld(move.toR, move.toC);
+            const endPos = new THREE.Vector3(targetWorld.x, 0.12, targetWorld.z);
+
+            const duration = 260;
+            const startTime = performance.now();
+
+            function step(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const ease = 0.5 - Math.cos(progress * Math.PI) / 2;
+
+                mesh.position.x = startPos.x + (endPos.x - startPos.x) * ease;
+                mesh.position.z = startPos.z + (endPos.z - startPos.z) * ease;
+                mesh.position.y = 0.12 + Math.sin(progress * Math.PI) * (move.isJump ? 1.1 : 0.35);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    mesh.position.copy(endPos);
+                    mesh.userData.row = move.toR;
+                    mesh.userData.col = move.toC;
+
+                    board[move.toR][move.toC] = movingPieceData;
+                    pieceMeshes[move.toR][move.toC] = mesh;
+
+                    // Handle Capture & Kill Animation
+                    if (move.isJump) {
+                        const capData = board[move.capR][move.capC];
+                        const capMesh = pieceMeshes[move.capR][move.capC];
+                        if (capMesh) {
+                            const capTheme = capData && capData.player === PLAYER1 ? COLOR_THEMES[p1ColorKey] : COLOR_THEMES[p2ColorKey];
+                            triggerKillAnimation(capMesh.position, capTheme.hex, capTheme.ring);
+                            piecesGroup.remove(capMesh);
+                        }
+                        board[move.capR][move.capC] = null;
+                        pieceMeshes[move.capR][move.capC] = null;
+                        playSound('capture');
+                    } else {
+                        playSound('move');
+                    }
+
+                    // Check King Promotion
+                    let promoted = false;
+                    if (!movingPieceData.isKing) {
+                        if ((movingPieceData.player === PLAYER1 && move.toR === 0) ||
+                            (movingPieceData.player === PLAYER2 && move.toR === BOARD_SIZE - 1)) {
+                            movingPieceData.isKing = true;
+                            promoted = true;
+                            addKingCrown(mesh);
+                            playSound('king');
+                        }
+                    }
+
+                    // Multi-jump check
+                    if (move.isJump && !promoted) {
+                        const followUpJumps = getPieceMoves(move.toR, move.toC, board).filter(m => m.isJump);
+                        if (followUpJumps.length > 0) {
+                            mustContinueJumpFrom = { r: move.toR, c: move.toC };
+                            selectedPiece = { r: move.toR, c: move.toC };
+                            validMoves = followUpJumps;
+                            isAnimating = false;
+                            updateHUD();
+                            renderHighlights();
+
+                            if (vsAI && turn === PLAYER2) {
+                                setTimeout(triggerAIMove, 420);
+                            }
+                            return;
+                        }
+                    }
+
+                    finalizeTurnAfterMove();
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        function finalizeTurnAfterMove() {
+            mustContinueJumpFrom = null;
+            selectedPiece = null;
+            validMoves = [];
+            turn = turn === PLAYER1 ? PLAYER2 : PLAYER1;
+            isAnimating = false;
+            updateHUD();
+
+            const nextMoves = getAllValidMoves(turn, board);
+            if (nextMoves.length === 0) {
+                endGame(turn === PLAYER1 ? PLAYER2 : PLAYER1);
+                return;
+            }
+
+            if (vsAI && turn === PLAYER2) {
+                setTimeout(triggerAIMove, 460);
+            }
+        }
+
+        // Explosive 3D Kill / Vaporize Animation Effect
+        function triggerKillAnimation(pos, primaryColorHex, ringColorHex) {
+            cameraShake = 0.35;
+
+            // 1. Expanding Neon Shockwave Ring on the Board
+            const waveGeo = new THREE.RingGeometry(0.2, 0.45, 32);
+            const waveMat = new THREE.MeshBasicMaterial({
+                color: ringColorHex,
+                transparent: true,
+                opacity: 0.95,
+                side: THREE.DoubleSide
+            });
+            const wave = new THREE.Mesh(waveGeo, waveMat);
+            wave.rotation.x = -Math.PI / 2;
+            wave.position.set(pos.x, 0.05, pos.z);
+            particlesGroup.add(wave);
+
+            // 2. Vertical Laser Vaporization Beam
+            const beamGeo = new THREE.CylinderGeometry(0.35, 0.55, 6.5, 16, 1, true);
+            const beamMat = new THREE.MeshBasicMaterial({
+                color: primaryColorHex,
+                transparent: true,
+                opacity: 0.75,
+                side: THREE.DoubleSide
+            });
+            const beam = new THREE.Mesh(beamGeo, beamMat);
+            beam.position.set(pos.x, 3.2, pos.z);
+            particlesGroup.add(beam);
+
+            killEffects.push({ wave, beam, life: 1.0 });
+
+            // 3. 36 Glowing Neon Shards & Sparks
+            for (let i = 0; i < 36; i++) {
+                const isShard = i % 2 === 0;
+                const pGeo = isShard ? new THREE.BoxGeometry(0.14, 0.14, 0.14) : new THREE.SphereGeometry(0.09, 8, 8);
+                const pMat = new THREE.MeshBasicMaterial({ color: isShard ? primaryColorHex : ringColorHex });
+                const p = new THREE.Mesh(pGeo, pMat);
+                p.position.copy(pos);
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 0.05 + Math.random() * 0.14;
+                particlesGroup.add(p);
+                particles.push({
+                    mesh: p,
+                    vx: Math.cos(angle) * speed,
+                    vy: 0.09 + Math.random() * 0.16,
+                    vz: Math.sin(angle) * speed,
+                    rx: (Math.random() - 0.5) * 0.3,
+                    ry: (Math.random() - 0.5) * 0.3,
+                    life: 1.0
+                });
+            }
+        }
+
+        // Victory Fireworks Launcher
+        function spawnFireworkBurst() {
+            const fireworkColors = [0x06b6d4, 0xec4899, 0x10b981, 0xfacc15, 0x8b5cf6, 0xf43f5e, 0x38bdf8];
+            const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+            const bx = (Math.random() - 0.5) * 10;
+            const by = 4.2 + Math.random() * 3.8;
+            const bz = (Math.random() - 0.5) * 10;
+
+            playSound('select');
+
+            for (let i = 0; i < 42; i++) {
+                const pGeo = new THREE.SphereGeometry(0.1, 8, 8);
+                const pMat = new THREE.MeshBasicMaterial({ color });
+                const p = new THREE.Mesh(pGeo, pMat);
+                p.position.set(bx, by, bz);
+
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                const speed = 0.08 + Math.random() * 0.15;
+
+                particlesGroup.add(p);
+                particles.push({
+                    mesh: p,
+                    vx: Math.sin(phi) * Math.cos(theta) * speed,
+                    vy: Math.cos(phi) * speed + 0.04,
+                    vz: Math.sin(phi) * Math.sin(theta) * speed,
+                    rx: 0,
+                    ry: 0,
+                    life: 1.15
+                });
+            }
+        }
+
+        function startVictoryFireworks() {
+            stopVictoryFireworks();
+            spawnFireworkBurst();
+            setTimeout(spawnFireworkBurst, 300);
+            fireworkInterval = setInterval(spawnFireworkBurst, 750);
+        }
+
+        function stopVictoryFireworks() {
+            if (fireworkInterval) {
+                clearInterval(fireworkInterval);
+                fireworkInterval = null;
+            }
+        }
+
+        // AI Engine supporting Easy (Everyone Can Win!), Medium, and Hard (Minimax)
+        function triggerAIMove() {
+            if (gameOver || turn !== PLAYER2) return;
+
+            const legalMoves = getAllValidMoves(PLAYER2, board, mustContinueJumpFrom);
+            if (legalMoves.length === 0) {
+                endGame(PLAYER1);
+                return;
+            }
+
+            let chosenMove = legalMoves[0];
+
+            if (aiDifficulty === 'easy') {
+                // Easy Mode: Deliberately casual & forgiving so anyone can win!
+                const nonJumps = legalMoves.filter(m => !m.isJump);
+                if (nonJumps.length > 0 && Math.random() < 0.85) {
+                    chosenMove = nonJumps[Math.floor(Math.random() * nonJumps.length)];
+                } else {
+                    chosenMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
+                }
+            } else if (aiDifficulty === 'medium') {
+                // Medium Mode: Shallow 2-ply tactical evaluation with slight randomness
+                let bestScore = -Infinity;
+                for (const move of legalMoves) {
+                    const simBoard = cloneBoard(board);
+                    applyMoveToBoard(simBoard, move);
+                    let score = minimax(simBoard, 2, -Infinity, Infinity, false) + (Math.random() * 12 - 6);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        chosenMove = move;
+                    }
+                }
+            } else {
+                // Hard Mode: Deep 4-ply Minimax with Alpha-Beta Pruning
+                let bestScore = -Infinity;
+                for (const move of legalMoves) {
+                    const simBoard = cloneBoard(board);
+                    applyMoveToBoard(simBoard, move);
+                    const score = minimax(simBoard, 4, -Infinity, Infinity, false);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        chosenMove = move;
+                    }
+                }
+            }
+
+            executeMove(chosenMove);
+        }
+
+        function cloneBoard(b) {
+            return b.map(row => row.map(cell => cell ? { ...cell } : null));
+        }
+
+        function applyMoveToBoard(b, move) {
+            const piece = b[move.fromR][move.fromC];
+            b[move.fromR][move.fromC] = null;
+            if (move.isJump) {
+                b[move.capR][move.capC] = null;
+            }
+            if ((piece.player === PLAYER1 && move.toR === 0) ||
+                (piece.player === PLAYER2 && move.toR === BOARD_SIZE - 1)) {
+                piece.isKing = true;
+            }
+            b[move.toR][move.toC] = piece;
+        }
+
+        function evaluateBoard(b) {
+            let score = 0;
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const p = b[r][c];
+                    if (!p) continue;
+                    const val = p.isKing ? 18 : 10;
+                    const advanceBonus = p.player === PLAYER2 ? r * 0.5 : (7 - r) * 0.5;
+                    if (p.player === PLAYER2) {
+                        score += val + advanceBonus;
+                    } else {
+                        score -= val + advanceBonus;
+                    }
+                }
+            }
+            return score;
+        }
+
+        function minimax(b, depth, alpha, beta, maximizingPlayer) {
+            const player = maximizingPlayer ? PLAYER2 : PLAYER1;
+            const moves = getAllValidMoves(player, b);
+
+            if (depth === 0 || moves.length === 0) {
+                if (moves.length === 0) {
+                    return maximizingPlayer ? -999 : 999;
+                }
+                return evaluateBoard(b);
+            }
+
+            if (maximizingPlayer) {
+                let maxEval = -Infinity;
+                for (const m of moves) {
+                    const nextB = cloneBoard(b);
+                    applyMoveToBoard(nextB, m);
+                    const ev = minimax(nextB, depth - 1, alpha, beta, false);
+                    maxEval = Math.max(maxEval, ev);
+                    alpha = Math.max(alpha, ev);
+                    if (beta <= alpha) break;
+                }
+                return maxEval;
+            } else {
+                let minEval = Infinity;
+                for (const m of moves) {
+                    const nextB = cloneBoard(b);
+                    applyMoveToBoard(nextB, m);
+                    const ev = minimax(nextB, depth - 1, alpha, beta, true);
+                    minEval = Math.min(minEval, ev);
+                    beta = Math.min(beta, ev);
+                    if (beta <= alpha) break;
+                }
+                return minEval;
+            }
+        }
+
+        // HUD & Modal Updates
+        function updateHUD() {
+            let count1 = 0, count2 = 0;
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (board[r][c]) {
+                        if (board[r][c].player === PLAYER1) count1++;
+                        else count2++;
+                    }
+                }
+            }
+
+            document.getElementById('score-p1').innerText = count1;
+            document.getElementById('score-p2').innerText = count2;
+
+            const badge1 = document.getElementById('badge-p1');
+            const badge2 = document.getElementById('badge-p2');
+            const indicator = document.getElementById('turn-indicator');
+            const t1 = COLOR_THEMES[p1ColorKey];
+            const t2 = COLOR_THEMES[p2ColorKey];
+
+            if (turn === PLAYER1) {
+                badge1.className = `flex items-center space-x-2 px-3 py-1 rounded-lg border ${t1.cssBadge} transition-all`;
+                badge2.className = "flex items-center space-x-2 px-3 py-1 rounded-lg border border-transparent opacity-60 transition-all";
+                indicator.innerText = `${p1Name} #${p1Number}'s Turn`;
+                indicator.className = `text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-slate-900 border border-slate-700 ${t1.cssText}`;
+            } else {
+                badge2.className = `flex items-center space-x-2 px-3 py-1 rounded-lg border ${t2.cssBadge} transition-all`;
+                badge1.className = "flex items-center space-x-2 px-3 py-1 rounded-lg border border-transparent opacity-60 transition-all";
+                indicator.innerText = vsAI ? "AI Thinking..." : `${p2Name} #${p2Number}'s Turn`;
+                indicator.className = `text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-slate-900 border border-slate-700 ${t2.cssText}`;
+            }
+
+            if (count2 === 0 && !gameOver) {
+                endGame(PLAYER1);
+            } else if (count1 === 0 && !gameOver) {
+                endGame(PLAYER2);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('status-toast');
+            toast.innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2000);
+        }
+
+        function endGame(winner) {
+            gameOver = true;
+            const modal = document.getElementById('win-modal');
+            const title = document.getElementById('win-title');
+            const subtitle = document.getElementById('win-subtitle');
+            const rewardBadge = document.getElementById('reward-badge');
+            const rewardText = document.getElementById('reward-text');
+            const streakBonusBadge = document.getElementById('streak-bonus-badge');
+
+            const t1 = COLOR_THEMES[p1ColorKey];
+            const t2 = COLOR_THEMES[p2ColorKey];
+            let triggeredStreakBonus = false;
+
+            if (winner === PLAYER1) {
+                title.innerText = `${p1Name} (#${p1Number}) Wins!`;
+                title.className = `text-2xl font-extrabold ${t1.cssText} mb-1`;
+                subtitle.innerText = vsAI ? `Victory on ${aiDifficulty.toUpperCase()} mode!` : "All opponent pieces captured!";
+
+                // Increment Player 1 Win Streak
+                const nextStreak = winStreak + 1;
+                saveStreak(nextStreak);
+
+                // Award Gold Coins: 4000 for Hard AI win, 200 for any other win
+                let earnedCoins = (vsAI && aiDifficulty === 'hard') ? 4000 : 200;
+
+                // Check for 3-Win Streak Milestone (3, 6, 9, ...)
+                if (nextStreak > 0 && nextStreak % 3 === 0) {
+                    earnedCoins += 3000;
+                    triggeredStreakBonus = true;
+                    streakBonusBadge.classList.remove('hidden');
+                } else {
+                    streakBonusBadge.classList.add('hidden');
+                }
+
+                addCoins(earnedCoins);
+
+                rewardBadge.classList.remove('hidden');
+                rewardText.innerText = `+${earnedCoins.toLocaleString()} Gold Coins!`;
+            } else {
+                // Reset Player 1 Win Streak on loss
+                saveStreak(0);
+                streakBonusBadge.classList.add('hidden');
+
+                title.innerText = vsAI ? "AI Wins!" : `${p2Name} (#${p2Number}) Wins!`;
+                title.className = `text-2xl font-extrabold ${t2.cssText} mb-1`;
+                subtitle.innerText = vsAI ? `Better luck next time, ${p1Name} (#${p1Number})!` : `All of ${p1Name}'s pieces captured!`;
+
+                if (!vsAI) {
+                    // In 2-Player mode, award 200 coins to the shared bank for completing the match
+                    addCoins(200);
+                    rewardBadge.classList.remove('hidden');
+                    rewardText.innerText = "+200 Gold Coins!";
+                } else {
+                    rewardBadge.classList.add('hidden');
+                }
+            }
+
+            playSound(triggeredStreakBonus ? 'streak_bonus' : 'king');
+            startVictoryFireworks();
+            modal.classList.remove('hidden');
+        }
+
+        // Main Render Loop
+        let lastTime = 0;
+
+        function animate(time) {
+            requestAnimationFrame(animate);
+            const delta = Math.min((time - lastTime) / 1000, 0.1);
+            lastTime = time;
+
+            // Gentle hover pulse on selected piece
+            if (selectedPiece && pieceMeshes[selectedPiece.r][selectedPiece.c] && !isAnimating) {
+                const m = pieceMeshes[selectedPiece.r][selectedPiece.c];
+                m.position.y = 0.12 + Math.sin(time * 0.008) * 0.06;
+            }
+
+            // Rotate King crowns
+            piecesGroup.traverse(obj => {
+                if (obj.userData && obj.userData.isCrown) {
+                    obj.rotation.z += delta * 2.0;
+                }
+            });
+
+            // Update kill shockwave rings & beams
+            for (let i = killEffects.length - 1; i >= 0; i--) {
+                const fx = killEffects[i];
+                fx.life -= delta * 2.4;
+                const progress = 1.0 - Math.max(fx.life, 0);
+
+                // Expand shockwave ring outward
+                const scale = 1.0 + progress * 4.5;
+                fx.wave.scale.set(scale, scale, 1);
+                fx.wave.material.opacity = Math.max(fx.life, 0);
+
+                // Shrink beam radius and fade out
+                const beamScale = Math.max(1.0 - progress * 0.85, 0.05);
+                fx.beam.scale.set(beamScale, 1.0 + progress * 0.5, beamScale);
+                fx.beam.material.opacity = Math.max(fx.life * 0.75, 0);
+
+                if (fx.life <= 0) {
+                    particlesGroup.remove(fx.wave);
+                    particlesGroup.remove(fx.beam);
+                    killEffects.splice(i, 1);
+                }
+            }
+
+            // Update capture explosion particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.mesh.position.x += p.vx;
+                p.mesh.position.y += p.vy;
+                p.mesh.position.z += p.vz;
+                if (p.rx) p.mesh.rotation.x += p.rx;
+                if (p.ry) p.mesh.rotation.y += p.ry;
+                p.vy -= 0.007; // gravity
+                p.life -= delta * 1.6;
+                p.mesh.scale.setScalar(Math.max(p.life, 0.01));
+
+                if (p.life <= 0) {
+                    particlesGroup.remove(p.mesh);
+                    particles.splice(i, 1);
+                }
+            }
+
+            controls.update();
+
+            // Apply subtle camera shake on capture impact
+            if (cameraShake > 0.005) {
+                const origX = camera.position.x;
+                const origY = camera.position.y;
+                const origZ = camera.position.z;
+                camera.position.x += (Math.random() - 0.5) * cameraShake;
+                camera.position.y += (Math.random() - 0.5) * cameraShake;
+                camera.position.z += (Math.random() - 0.5) * cameraShake;
+                cameraShake *= 0.85;
+                renderer.render(scene, camera);
+                camera.position.set(origX, origY, origZ);
+            } else {
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.onload = function () {
+            init();
+        };
+    </script>
+</body>
+</html>
